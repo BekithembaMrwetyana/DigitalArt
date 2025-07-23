@@ -1,24 +1,29 @@
 package domain;
 
-/*
-Order.java
-Order POJO class
-Author: Mpilonhle Zimela Mzimela 230197833
-Date: 05 May 2025
-*/
-
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Entity
+@Table(name = "orders")
 public class Order {
 
+    @Id
     private int orderID;
+
     private int userID;
-    private List<OrderItem> orderItems;
     private double totalAmount;
     private LocalDateTime orderDate;
     private int paymentID;
     private String paymentStatus;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "orderID", referencedColumnName = "orderID")
+    private List<OrderItem> orderItems;
+
+    protected Order() {
+
+    }
 
     private Order(Builder builder) {
         this.orderID = builder.orderID;
@@ -115,7 +120,6 @@ public class Order {
             this.paymentStatus = paymentStatus;
             return this;
         }
-
 
         public Builder copy(Order order) {
             this.orderID = order.orderID;

@@ -5,13 +5,21 @@ Category POJO class
 Author: Abethu Ngxitho 221297820
 Date: 07 May 2025
 */
-public class Category {
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
+@Entity
+public class Category {
+   @Id
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String categoryID;
     private String name;
     private String description;
 
-    private Category() {
+   protected Category() {
 
     }
 
@@ -69,6 +77,7 @@ public class Category {
         }
 
         public Category build(){
+
             return new Category(this);
         }
     }

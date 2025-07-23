@@ -7,19 +7,24 @@ Author: Bekithemba Mrwetyana (222706066)
 Date: 04 May 2025
 */
 
-import java.time.LocalDateTime;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
+import java.time.LocalDate;
+
+@Entity
+@Table (name = "payment")
 public class Payment {
 
-
-    private int paymentID;
-    private LocalDateTime paymentDate;
+    @Id
+    private String paymentID;
+    private LocalDate paymentDate;
     private double amount;
     private String status;
     private String method;
 
-    public Payment() {
-
+    protected Payment() {
     }
 
     public Payment(Builder builder) {
@@ -30,7 +35,7 @@ public class Payment {
         this.method = builder.method;
     }
 
-    public int getPaymentID() {
+    public String getPaymentID() {
         return paymentID;
     }
 
@@ -38,7 +43,7 @@ public class Payment {
         return amount;
     }
 
-    public LocalDateTime getPaymentDate() {
+    public LocalDate getPaymentDate() {
         return paymentDate;
     }
 
@@ -63,18 +68,18 @@ public class Payment {
 
     public static class Builder{
 
-        private int paymentID;
-        private LocalDateTime paymentDate;
+        private String paymentID;
+        private LocalDate paymentDate;
         private double amount;
         private String status;
         private String method;
 
-        public Builder setPaymentID(int paymentID) {
+        public Builder setPaymentID(String paymentID) {
             this.paymentID = paymentID;
             return this;
         }
 
-        public Builder setPaymentDate(LocalDateTime paymentDate) {
+        public Builder setPaymentDate(LocalDate paymentDate) {
             this.paymentDate = paymentDate;
             return this;
         }

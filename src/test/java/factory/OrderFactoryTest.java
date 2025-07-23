@@ -36,7 +36,7 @@ class OrderFactoryTest {
         OrderItem item1 = new OrderItem.Builder()
                 .setItemID(1)
                 .setOrderID(orderID)
-                .setProductID(101)
+
                 .setQuantity(2)
                 .setUnitPrice(10.99)
                 .calculateSubTotal()
@@ -45,8 +45,7 @@ class OrderFactoryTest {
         OrderItem item2 = new OrderItem.Builder()
                 .setItemID(2)
                 .setOrderID(orderID)
-                .setProductID(102)
-                .setQuantity(1)
+
                 .setUnitPrice(5.99)
                 .calculateSubTotal()
                 .build();
@@ -82,7 +81,7 @@ class OrderFactoryTest {
         OrderItem firstItem = order.getOrderItems().get(0);
         assertEquals(1, firstItem.getItemID());
         assertEquals(orderID, firstItem.getOrderID());
-        assertEquals(101, firstItem.getProductID());
+
         assertEquals(2, firstItem.getQuantity());
         assertEquals(10.99, firstItem.getUnitPrice(), 0.001);
         assertEquals(21.98, firstItem.getSubTotal(), 0.001);
@@ -97,7 +96,7 @@ class OrderFactoryTest {
         OrderItem item = new OrderItem.Builder()
                 .setItemID(3)
                 .setOrderID(orderID)
-                .setProductID(103)
+
                 .setQuantity(1)
                 .setUnitPrice(15.50)
                 .calculateSubTotal()
@@ -133,7 +132,7 @@ class OrderFactoryTest {
         OrderItem orderItem = order.getOrderItems().get(0);
         assertEquals(3, orderItem.getItemID());
         assertEquals(orderID, orderItem.getOrderID());
-        assertEquals(103, orderItem.getProductID());
+
         assertEquals(1, orderItem.getQuantity());
         assertEquals(15.50, orderItem.getUnitPrice(), 0.001);
         assertEquals(15.50, orderItem.getSubTotal(), 0.001);

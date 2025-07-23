@@ -7,30 +7,42 @@ Author: Bekithemba Mrwetyana (222706066)
 Date: 01 May 2025
 */
 
+import jakarta.persistence.*;
+
 import java.util.List;
 
+@Entity
+@Table(name = "Cart")
 public class Cart {
 
-    private int cartID;
-    private int userID;
-    private List<Product> items;
+    @Id
+    private String cartID;
 
-    private Cart(Builder builder) {
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "userID", referencedColumnName = "userID")
+    private User userID;
+
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
+    private List<CartItem> cartItems;
+
+    protected Cart(){}
+
+    public Cart(Builder builder) {
         this.cartID = builder.cartID;
         this.userID = builder.userID;
-        this.items = builder.items;
+        this.cartItems = builder.cartItems;
     }
 
-    public int getCartID() {
+    public String getCartID() {
         return cartID;
     }
 
-    public int getUserID() {
+    public User getUserID() {
         return userID;
     }
 
-    public List<Product> getItems() {
-        return items;
+    public List<CartItem> getCartItems() {
+        return cartItems;
     }
 
     @Override
@@ -38,35 +50,35 @@ public class Cart {
         return "Cart{" +
                 "cartID=" + cartID +
                 ", userID=" + userID +
-                ", itemId=" + items +
+                ", cartItem=" + cartItems +
                 '}';
     }
 
     public static class Builder{
 
-        private int cartID;
-        private int userID;
-        private List<Product> items;
+        private String cartID;
+        private User userID;
+        private List<CartItem> cartItems;
 
-        public Builder setCartID(int cartID) {
+        public Builder setCartID(String cartID) {
             this.cartID = cartID;
             return this;
         }
 
-        public Builder setUserID(int userID) {
+        public Builder setUserID(User userID) {
             this.userID = userID;
             return this;
         }
 
-        public Builder setItems(List<Product> items) {
-            this.items = items;
+        public Builder setCartItem(List<CartItem> cartItems) {
+            this.cartItems = cartItems;
             return this;
         }
 
         public Builder copy(Cart cart){
             this.cartID = cart.cartID;
             this.userID = cart.userID;
-            this.items = cart.items;
+            this.cartItems = cart.cartItems;
             return this;
         }
         public Cart build(){

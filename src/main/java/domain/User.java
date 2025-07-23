@@ -3,12 +3,19 @@ package domain;
 /*
 User.java
 User POJO class
-Author: Luvo Nana 221376909
+Author: Luvoo Nana 221376909
 Date: 08 May 2025
 */
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "users")
 public class User {
 
+    @Id
     private int userId;
     private String lastName;
     private String firstName;
@@ -35,6 +42,9 @@ public class User {
         return password;
     }
 
+    public User() {
+    }
+
     public User(int userId, String lastName, String firstName, String email, String password) {
         this.userId = userId;
         this.lastName = lastName;
@@ -42,7 +52,6 @@ public class User {
         this.email = email;
         this.password = password;
     }
-
 
     public void setUserId(int userId) {
         this.userId = userId;
@@ -116,7 +125,6 @@ public class User {
             return this;
         }
 
-
         public Builder copy(User item) {
             this.userId = item.userId;
             this.lastName = item.lastName;
@@ -131,5 +139,3 @@ public class User {
         }
     }
 }
-
-

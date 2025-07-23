@@ -1,19 +1,27 @@
 package domain;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import java.util.List;
 /*
 Product.java
 Product POJO class
 Author: Thimna Gogwana (222213973)
-Date: 10 May 2025
+Date: 25 May 2025
 */
-
+@Entity
+@Table
 public class  Product {
-
+    @Id
     private String productID;
     private String categoryID;
     private String title;
     private String description;
     private double price;
+
+    @OneToMany(mappedBy = "product")
+    private List<OrderItem> orderItems;
 
     public Product(){
     }

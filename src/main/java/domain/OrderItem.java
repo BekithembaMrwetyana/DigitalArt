@@ -1,22 +1,40 @@
 package domain;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 /*
  OrderItem.java
  OrderItem POJO class
  Author : Thimna Gogwana 222213973
- Date: 05 May 2025
+ Date: 25 May 2025
 */
+@Entity
+@Table
 public class OrderItem {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int itemID;
     private int orderID;
-    private int productID;
+
+    @ManyToOne
+    private Product product;
+
+    
     private int quantity;
     private double unitPrice;
     private double subTotal;
+    
+    protected OrderItem(){
+        
+    }
 
     private OrderItem(Builder builder) {
         this.itemID = builder.itemID;
         this.orderID = builder.orderID;
-        this.productID = builder.productID;
+        this.product = builder.product;
         this.quantity = builder.quantity;
         this.unitPrice = builder.unitPrice;
         this.subTotal = builder.subTotal;
@@ -30,8 +48,8 @@ public class OrderItem {
         return orderID;
     }
 
-    public int getProductID() {
-        return productID;
+    public Product getProduct() {
+        return product;
     }
 
     public int getQuantity() {
@@ -51,7 +69,7 @@ public class OrderItem {
         return "OrderItem{" +
                 "itemID=" + itemID +
                 ", orderID=" + orderID +
-                ", productID=" + productID +
+                ", product=" + product +
                 ", quantity=" + quantity +
                 ", unitPrice=" + unitPrice +
                 ", subTotal=" + subTotal +
@@ -62,7 +80,7 @@ public class OrderItem {
 
         private int itemID;
         private int orderID;
-        private int productID;
+        private Product product;
         private int quantity;
         private double unitPrice;
         private double subTotal;
@@ -77,8 +95,8 @@ public class OrderItem {
             return this;
         }
 
-        public Builder setProductID(int productID) {
-            this.productID = productID;
+        public Builder setProduct(Product product) {
+            this.product = this.product;
             return this;
         }
 
@@ -105,7 +123,7 @@ public class OrderItem {
         public Builder copy(OrderItem item) {
             this.itemID = item.itemID;
             this.orderID = item.orderID;
-            this.productID = item.productID;
+            this.product = item.product;
             this.quantity = item.quantity;
             this.unitPrice = item.unitPrice;
             this.subTotal = item.subTotal;
@@ -114,14 +132,10 @@ public class OrderItem {
 
         public OrderItem build() {
             return new OrderItem(this);
+
         }
     }
 }
-
-
-
-
-
 
 
 
