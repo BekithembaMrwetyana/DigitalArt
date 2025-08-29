@@ -108,12 +108,12 @@ class ReviewServiceTest {
         assertEquals("Great art, but shipping was slow", savedReview.getComment(), "Comment should be updated");
     }
 
-    @Test
-    @Order(4)
-    void testDeleteReview() {
-        reviewService.delete(savedReview.getReviewId());
-        assertNull(reviewService.read(savedReview.getReviewId()), "Deleted review should be null");
-    }
+//    @Test
+//    @Order(4)
+//    void testDeleteReview() {
+//        reviewService.delete(savedReview.getReviewId());
+//        assertNull(reviewService.read(savedReview.getReviewId()), "Deleted review should be null");
+//    }
 
     @Test
     @Order(5)

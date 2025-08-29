@@ -30,13 +30,15 @@ class ArtBrandControllerTest {
 
     @BeforeAll
     void setup() {
-        artBrand = ArtBrandFactory.createArtBrand(
-                "Zeebrah",
-                "https://sl.bing.net/iQ2c6HPUr6W",
-                "zebras running",
-                LocalDate.now()
-        );
-    }
+            String imageUrl = "https://i.natgeofe.com/n/9a6e5e2e-5e7f-4308-a33e-64cf1978a649/42-18269780_square.jpg".trim();
+            artBrand = ArtBrandFactory.createArtBrand(
+                    "ZeebrahStudios",
+                    imageUrl,
+                    "zebras running",
+                    LocalDate.now()
+            );
+        }
+
 
     @Test
     @Order(1)
@@ -110,5 +112,5 @@ class ArtBrandControllerTest {
     @Order(5)
     void e_delete() {
 
-        restTemplate.delete(BASE_URL + "/delete" + artBrand.getBrandId() );
+        restTemplate.delete(BASE_URL + "/delete/" + artBrand.getBrandId() );
 }}
