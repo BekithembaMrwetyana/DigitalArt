@@ -22,19 +22,23 @@ class ArtBrandServiceTest {
 
     @BeforeAll
     static void setUp() {
+
+        String imageUrl = "https://i.natgeofe.com/n/9a6e5e2e-5e7f-4308-a33e-64cf1978a649/42-18269780_square.jpg".trim();
         brand1 = ArtBrandFactory.createArtBrand(
-                "Zeebrah",
-                "https://sl.bing.net/iQ2c6HPUr6W",
+                "ZeebrahStudios",
+                imageUrl,
                 "Zebras running, having fun",
                 LocalDate.now()
         );
         assertNotNull(brand1);
         System.out.println(brand1);
 
-        brand2 = ArtBrandFactory.createArtBrand(
-                "The Matrix",
-                "https://images.hdqwalls.com/download/bio-hackers-and-the-matrix-4k-6p-1920x1080.jpg",
-                "Matrix picture",
+        String imageUrl2 = "https://images.pexels.com/photos/33244771/pexels-photo-33244771/free-photo-of-majestic-mountain-peak-at-sunrise-with-soft-clouds.jpeg?auto=compress&cs=tinysrgb&w=800".trim();
+
+         brand2 = ArtBrandFactory.createArtBrand(
+                "Summit Art Studio",
+                imageUrl2,
+                "Majestic mountain peak at sunrise with clouds",
                 LocalDate.now()
         );
         assertNotNull(brand2);
@@ -68,7 +72,7 @@ class ArtBrandServiceTest {
     void c_update() {
         ArtBrand updatedBrand = new ArtBrand.Builder()
                 .copy(brand2)
-                .setDescription("Updated Matrix poster")
+                .setDescription("Breathtaking mountain view at sunrise")
                 .build();
         ArtBrand updated = service.update(updatedBrand);
         assertNotNull(updated);
