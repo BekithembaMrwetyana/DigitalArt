@@ -26,7 +26,7 @@ class ArtBrandControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    private static final String BASE_URL = "/art_brands";
+    private static final String BASE_URL = "/api/art_brands";
 
     @BeforeAll
     void setup() {
@@ -88,7 +88,7 @@ class ArtBrandControllerTest {
         assertEquals("Abstract Art", response.getBody().getBrandName());
         assertEquals("Updated description for Zeebrah", response.getBody().getDescription());
 
-        artBrand = response.getBody(); // update reference
+        artBrand = response.getBody();
         System.out.println("Updated: " + artBrand);
     }
 
