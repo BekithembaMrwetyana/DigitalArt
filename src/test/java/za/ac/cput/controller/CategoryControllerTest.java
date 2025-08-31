@@ -1,4 +1,11 @@
 package za.ac.cput.controller;
+/*
+CategoryControllerTest class
+Author: Abethu Ngxitho
+Date: 29 August 2025
+
+
+ */
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
