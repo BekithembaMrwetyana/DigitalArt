@@ -10,7 +10,8 @@ import za.ac.cput.service.CartItemService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/art_brands")
+@CrossOrigin
+@RequestMapping("/api/art_brands")
 public class ArtBrandController {
     private final ArtBrandService service;
     @Autowired
