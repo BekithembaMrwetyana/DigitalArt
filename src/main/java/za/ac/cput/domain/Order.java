@@ -23,7 +23,7 @@ public class Order {
     private Address shippingAddress;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId", nullable = true)
+    @JoinColumn(name = "userId", referencedColumnName = "userId", nullable = true)
     private User user;
 
     @Enumerated(EnumType.STRING)
@@ -59,6 +59,9 @@ public class Order {
         return orderID;
     }
 
+    public void setId(Long id) {
+        this.orderID = id;
+    }
 
 
     public List<CartItem> getCartItems() {

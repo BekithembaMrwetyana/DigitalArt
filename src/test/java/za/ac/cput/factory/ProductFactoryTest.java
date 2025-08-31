@@ -50,32 +50,41 @@ class ProductFactoryTest {
     @Test
     @Order(1)
     void a_createProducts() {
-        product1 = productFactory.create(1L, category1, "Portrait Art", "Digital portrait of a person", 150.0);
+        product1 = productFactory.create(1L, category1, "Portrait Art", "Digital portrait of a person", 150.0, "art6.jpeg");
+        product2 = productFactory.create(2L, category2, "Abstract Art", "Colorful abstract design", 200.0, "art5.jpeg");
+
         assertNotNull(product1);
         assertEquals("Portrait Art", product1.getTitle());
-        assertEquals("Digital portrait of a person", product1.getDescription());
-        assertEquals(150.0, product1.getPrice());
-        assertEquals(1001L, product1.getCategory().getCategoryId());
-        System.out.println("Product1 created: " + product1);
+        assertEquals("/images/art6.jpeg", product1.getImageUrl());
 
-        product2 = productFactory.create(2L, category2, "Abstract Art", "Colorful abstract design", 200.0);
         assertNotNull(product2);
         assertEquals("Abstract Art", product2.getTitle());
-        assertEquals("Colorful abstract design", product2.getDescription());
-        assertEquals(200.0, product2.getPrice());
-        assertEquals(1002L, product2.getCategory().getCategoryId());
-        System.out.println("Product2 created: " + product2);
+        assertEquals("/images/art5.jpeg", product2.getImageUrl());
+
+        System.out.println("Created products: " + product1 + ", " + product2);
     }
 
     @Test
     @Order(2)
     void b_copyProduct() {
-        Product copy = productFactory.copy(product1);
-        assertNotNull(copy);
-        assertEquals(product1.getTitle(), copy.getTitle());
-        assertEquals(product1.getDescription(), copy.getDescription());
-        assertEquals(product1.getPrice(), copy.getPrice());
-        assertEquals(product1.getCategory().getCategoryId(), copy.getCategory().getCategoryId());
-        System.out.println("Copied product: " + copy);
+        Product copy1 = productFactory.copy(product1);
+        Product copy2 = productFactory.copy(product2);
+
+        assertNotNull(copy1);
+        assertEquals(product1.getTitle(), copy1.getTitle());
+        assertEquals(product1.getDescription(), copy1.getDescription());
+        assertEquals(product1.getPrice(), copy1.getPrice());
+        assertEquals(product1.getImageUrl(), copy1.getImageUrl());
+        assertEquals(product1.getCategory().getCategoryId(), copy1.getCategory().getCategoryId());
+
+        assertNotNull(copy2);
+        assertEquals(product2.getTitle(), copy2.getTitle());
+        assertEquals(product2.getDescription(), copy2.getDescription());
+        assertEquals(product2.getPrice(), copy2.getPrice());
+        assertEquals(product2.getImageUrl(), copy2.getImageUrl());
+        assertEquals(product2.getCategory().getCategoryId(), copy2.getCategory().getCategoryId());
+
+
+        System.out.println("Copied products: " + copy1 + ", " + copy2);
     }
 }
