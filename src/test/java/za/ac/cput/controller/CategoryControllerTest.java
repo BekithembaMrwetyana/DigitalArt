@@ -71,11 +71,11 @@ class CategoryControllerTest {
         System.out.println("Updated: " + category);
     }
 
-    @Test
-    @Order(5)
-    void e_delete() {
-       restTemplate.delete(BASE_URL + "/delete/" + category.getCategoryId());
-    }
+   @Test
+   @Order(5)
+   void d_delete() {
+        restTemplate.delete(BASE_URL + "/delete/" + category.getCategoryId());
+   }
 
     @Test
     @Order(4)
