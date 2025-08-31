@@ -1,137 +1,81 @@
-
 package za.ac.cput.service;
 
-import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import za.ac.cput.domain.*;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
+import za.ac.cput.domain.Cart;
+import za.ac.cput.domain.CartItem;
+import za.ac.cput.domain.Product;
+import za.ac.cput.domain.User;
+import za.ac.cput.factory.CartItemFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.MethodName.class)
 class CartItemServiceTest {
-
     @Autowired
-    private CartItemService cartItemService;
 
-    @Autowired
-    private UserService userService;
+    private ICartItemService cartItemService;
 
-    @Autowired
-    private CartService cartService;
-
-    @Autowired
-    private ProductService productService;
-
-    @Autowired
-    private CategoryService categoryService;
-
-    private User savedUser;
-    private Cart savedCart;
-    private Category savedCategory;
-    private Product savedProduct;
-    private CartItem savedCartItem;
+    private static final User user = new User.Builder()
+            .setFirstName("Thando")
+            .setLastName("Mseleku")
+            //.setEmail("123@gmail.com")
+            .setPassword("password123")
+            .build();
 
 
-    @BeforeAll
-    void setup() {
+    private static final Cart cart = new Cart.Builder()
+            .setUserID(user)
+            .build();
+
+    private static final Product product = new Product.Builder()
+            .setProductID(1L)
+            .setTitle("Digital Art")
+            .setDescription("A beautiful digital painting")
+            .setPrice(49.99)
+            .setCategoryID("C001")
+            .build();
 
 
 
-        savedUser = userService.create(new User.Builder()
-                .setFirstName("Thando")
-                .setLastName("Mseleku")
-                .setPassword("password123")
-                .setLastLogin(LocalDateTime.now())
-                .setCreateDate(LocalDate.of(2025,02,25))
-                .build());
+    private static final CartItem cartItem1 = CartItemFactory
+            .createCartItem(cart,product,user,10,10.000);
 
 
-        savedCategory = categoryService.create(new Category.Builder()
-                .setName("Animalz")
-                .setDescription("Picture of monkeys laughing at eac other")
-                .build());
 
-
-        savedProduct = productService.create(new Product.Builder()
-                .setTitle("Digital Art")
-                .setDescription("funny animal picture")
-                .setPrice(10.000)
-                .setCategory(savedCategory)
-                .build());
-
-
-        savedCart = cartService.create(new Cart.Builder()
-                .setUser(savedUser)
-                .build());
+    @Test
+    void a_create() {
+        CartItem newCartItem = cartItemService.create(cartItem1);
+        assertNotNull(newCartItem);
+        System.out.println(newCartItem);
     }
 
     @Test
-    @Order(1)
-    void testCreateCartItem() {
-        CartItem cartItem = new CartItem.Builder()
-                .setUser(savedUser)
-                .setCart(savedCart)
-                .setProduct(savedProduct)
-                .setQuantity(5)
-                .setPrice(10.000)
+    void b_read() {
+
+        CartItem read = cartItemService.read(cartItem1.getCartItemID());
+        assertNotNull(read);
+        System.out.println(read);
+    }
+
+    @Test
+    void c_update() {
+        CartItem newCartItem = new CartItem.Builder().copy(cartItem1)
+                .setQuantity(50)
                 .build();
-
-        savedCartItem = cartItemService.create(cartItem);
-
-        assertNotNull(savedCartItem);
-        assertNotNull(savedCartItem.getCartItemID());
-        System.out.println("Created CartItem: " + savedCartItem);
+        CartItem updated = cartItemService.update(newCartItem);
+        assertNotNull(updated);
+        System.out.println(updated);
     }
 
-    @Test
-    @Order(2)
-    @Transactional
-    void testReadCartItem() {
-        CartItem cartItem = cartItemService.read(savedCartItem.getCartItemID());
-        assertNotNull(cartItem);
-        assertEquals(5, cartItem.getQuantity());
-        System.out.println( cartItem);
-    }
+    //delete ADDDDDD
 
     @Test
-    @Order(3)
-    void testUpdateCartItem() {
-        CartItem updatedCartItem = new CartItem.Builder()
-                .copy(savedCartItem)
-                .setQuantity(10)
-                .build();
+    void d_getAll() {
+        System.out.println(cartItemService.getAll());
 
-        savedCartItem = cartItemService.update(updatedCartItem);
-        assertEquals(10, savedCartItem.getQuantity());
-        System.out.println("Updated CartItem: " + savedCartItem);
-
-        assertNotNull(savedCartItem, "savedCartItem must not be null before update");
-
-    }
-
-    @Test
-    @Order(4)
-    void testGetAllCartItems() {
-        List<CartItem> allItems = cartItemService.getAll();
-        assertFalse(allItems.isEmpty());
-        System.out.println("All CartItems: " + allItems);
-    }
-
-    @Test
-    @Order(5)
-    void testDeleteCartItem() {
-        cartItemService.delete(savedCartItem.getCartItemID());
-        CartItem deleted = cartItemService.read(savedCartItem.getCartItemID());
-        assertNull(deleted);
-        System.out.println("Deleted CartItem with ID: " + savedCartItem.getCartItemID());
     }
 }

@@ -26,17 +26,17 @@ public class InventoryServiceTest {
 
     private Inventory testInventory;
 
+    // Dummy product for testing
     private Product dummyProduct() {
         return new Product.Builder()
-                .setProductID(101L)
                 .setTitle("Test Product")
                 .setPrice(99.99)
                 .build();
     }
 
-    private Inventory buildInventory(Long id, Product product, int quantity) {
+    // Build inventory without setting ID manually
+    private Inventory buildInventory(Product product, int quantity) {
         return new Inventory.Builder()
-                .setInventoryID(id)
                 .setProduct(product)
                 .setQuantity(quantity)
                 .build();
@@ -44,9 +44,11 @@ public class InventoryServiceTest {
 
     @BeforeEach
     void setUp() {
+        // Clean DB before each test
         repository.deleteAll();
-        testInventory = buildInventory(1L, dummyProduct(), 50);
-        service.create(testInventory);
+
+        // Create inventory via service to ensure ID is generated
+        testInventory = service.create(buildInventory(dummyProduct(), 50));
     }
 
     @Test

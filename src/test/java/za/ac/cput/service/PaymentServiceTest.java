@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import za.ac.cput.domain.Payment;
 import za.ac.cput.domain.enums.PaymentStatus;
 import za.ac.cput.factory.PaymentFactory;
+
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
@@ -16,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class PaymentServiceTest {
 
     @Autowired
-    private static IPaymentService service;
+    private IPaymentService service;
 
     private Payment payment;
 
@@ -28,7 +29,6 @@ class PaymentServiceTest {
         );
     }
     @Test
-    @Order(1)
     void create() {
         Payment newPayment = service.create(payment);
         assertNotNull(newPayment);

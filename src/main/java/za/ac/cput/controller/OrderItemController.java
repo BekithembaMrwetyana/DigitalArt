@@ -8,7 +8,7 @@ import za.ac.cput.service.OrderItemService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/orderitems")
+@RequestMapping("/order_Items")
 public class OrderItemController {
 
     private final OrderItemService service;

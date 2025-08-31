@@ -10,13 +10,13 @@ Date: 25/05/2025
 */
 
 @Entity
-@Table(name = "cart_Item")
+@Table(name = "cart_Item" )
 public class CartItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long cartItemID;
+    private Long cartItemID; //change to Long
 
-    @ManyToOne()
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "cartID")
     private Cart cart;
 
@@ -24,15 +24,15 @@ public class CartItem {
     @JoinColumn(name = "productID")
     private Product product;
 
-    @ManyToOne()
-    @JoinColumn(name = "userId")
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId", nullable = false)
     private User user;
 
     @Column(name = "quantity", nullable = false)
     private int quantity;
 
     //add price
-    @Column(name = "price", nullable = false)
+    @Column(name = "price",nullable = false)
     private double price;
 
     protected CartItem() {
@@ -66,7 +66,6 @@ public class CartItem {
     public User getUser() {
         return user;
     }
-
     public double getPrice() {
         return price;
     }
@@ -75,6 +74,7 @@ public class CartItem {
     public String toString() {
         return "CartItem{" +
                 "cartItemID=" + cartItemID +
+                ", cart=" + cart +
                 ", product=" + product +
                 ", user=" + user +
                 ", quantity=" + quantity +
@@ -109,12 +109,10 @@ public class CartItem {
             this.cart = cart;
             return this;
         }
-
         public Builder setUser(User user) {
             this.user = user;
             return this;
         }
-
         public Builder setPrice(double price) {
             this.price = price;
             return this;
@@ -124,7 +122,7 @@ public class CartItem {
             this.cartItemID = cartItem.cartItemID;
             this.cart = cartItem.cart;
             this.product = cartItem.product;
-            this.user = cartItem.user;
+             this.user = cartItem.user;
             this.quantity = cartItem.quantity;
             this.price = cartItem.price;
             return this;

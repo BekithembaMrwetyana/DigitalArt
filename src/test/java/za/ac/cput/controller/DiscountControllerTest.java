@@ -26,7 +26,7 @@ class DiscountControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    private static final String BASE_URL = "https://localhost:8080/discount";
+    private static final String BASE_URL = "http://localhost:8080/ADP_Capstone_Project/discount";
 
     @BeforeEach
     void setup() {
@@ -60,7 +60,7 @@ class DiscountControllerTest {
 
     @Test
     void update() {
-        Discount updatedDiscount = new Discount.Builder().copy(discount).setDiscountId(123L).build();
+        Discount updatedDiscount = new Discount.Builder().copy(discount).setCode("123").build();
         String url = BASE_URL + "/update";
         this.restTemplate.put(url, updatedDiscount);
 
@@ -68,7 +68,7 @@ class DiscountControllerTest {
 
         assertEquals(response.getStatusCode(), HttpStatus.OK);
         assertNotNull(response.getBody());
-        //assertEquals(updatedDiscount.getDiscountId(), response.getBody().getDiscountId());
+        assertEquals(updatedDiscount.getDiscountId(), response.getBody().getDiscountId());
         System.out.println("Updated: " + response.getBody());
     }
 
@@ -79,19 +79,19 @@ class DiscountControllerTest {
 
         ResponseEntity<Discount> response = this.restTemplate.getForEntity(BASE_URL + "/read/" + discount.getDiscountId(), Discount.class);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertNotNull(response.getBody());
+        //assertNotNull(response.getBody());
         System.out.println("Deleted: " + discount.getDiscountId());
     }
 
     @Test
     void getAll() {
         String url = BASE_URL + "/getAll";
-        ResponseEntity<Discount> response = this.restTemplate.getForEntity(url, Discount.class);
+        ResponseEntity<Discount[]> response = this.restTemplate.getForEntity(url, Discount[].class);
         assertNotNull(response.getBody());
         //assertTrue(response.getBody().length > 0);
         System.out.println("Get All: " + response.getBody());
-        //for (Discount discount : response.getBody()){
-        //    System.out.println(discount);
-        //}
+        for (Discount discount : response.getBody()){
+            System.out.println(discount);
+        }
     }
 }

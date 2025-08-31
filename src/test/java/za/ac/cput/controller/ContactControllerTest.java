@@ -10,70 +10,81 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static za.ac.cput.controller.UserControllerTest.*;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.MethodName.class)
 class ContactControllerTest {
 
     private static Contact contact;
 
+    @Autowired
+    private TestRestTemplate restTemplate;
+
+    private static final String BASE_URL = "http://localhost:8080/ADP_Capstone_Project/contact";
+
     @BeforeAll
     public static void setup() {
-        contact = ContactFactory.createContact(
-                "0662134256",
-                "ethan.hunt@example.com",
-                "0791234567"
-        );
+        contact = ContactFactory.createContact("Ethan", "Hunt", "0791234567", "ethan.hunt@example.com");
     }
 
     @Test
     @Order(1)
-    void a_createContact() {
-        assertNotNull(contact);
-        System.out.println("Created Contact (factory only, no API call): " + contact);
+    void a_create() {
+        String url = BASE_URL + "/create";
+        ResponseEntity<Contact> postResponse = this.restTemplate.postForEntity(url, contact, Contact.class);
+        assertNotNull(postResponse);
+        Contact savedContact = postResponse.getBody();
+        assertNotNull(savedContact);
+        System.out.println("Created: " + savedContact);
     }
 
     @Test
     @Order(2)
-    void b_readFields() {
-        assertEquals("0662134256", contact.getPhoneNumber());
-        assertEquals("ethan.hunt@example.com", contact.getEmail());
-        assertEquals("0791234567", contact.getAltNumber());
-        System.out.println("Read fields from Contact: " + contact);
+    void b_read() {
+        String url = BASE_URL + "/read/" + contact.getContactId();
+        ResponseEntity<Contact> response = this.restTemplate.getForEntity(url, Contact.class);
+        assertNotNull(response.getBody());
+        assertEquals(contact.getContactId(), response.getBody().getContactId());
+        System.out.println("Read: " + response.getBody());
     }
 
     @Test
     @Order(3)
-    void c_updateContact() {
-        Contact updated = new Contact.Builder()
+    void c_update() {
+        Contact updatedContact = new Contact.Builder()
                 .copy(contact)
                 .setPhoneNumber("0787654321")
                 .build();
 
-        assertNotEquals(contact.getPhoneNumber(), updated.getPhoneNumber());
-        System.out.println("Updated Contact: " + updated);
+        String url = BASE_URL + "/update";
+        this.restTemplate.put(url, updatedContact);
+
+        ResponseEntity<Contact> response = this.restTemplate.getForEntity(BASE_URL + "/read/" + contact.getContactId(), Contact.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        System.out.println("Updated: " + response.getBody());
     }
 
     @Test
     @Order(4)
-    void d_deleteSimulation() {
-        contact = null;
-        assertNull(contact);
-        System.out.println("Deleted Contact (simulated by nulling reference).");
+    void d_delete() {
+        String url = BASE_URL + "/delete/" + contact.getContactId();
+        this.restTemplate.delete(url);
+
+        ResponseEntity<Contact> response = this.restTemplate.getForEntity(BASE_URL + "/read/" + contact.getContactId(), Contact.class);
+        // Depending on controller handling, it might return 404 or null body
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        System.out.println("Deleted contact with ID: " + contact.getContactId());
     }
 
     @Test
     @Order(5)
-    void e_getAllSimulation() {
-        Contact contact1 = ContactFactory.createContact("0711111111", "john.doe@example.com", "0722222222");
-        Contact contact2 = ContactFactory.createContact("0733333333", "jane.doe@example.com", "0744444444");
-
-        Contact[] allContacts = {contact1, contact2};
-
-        assertEquals(2, allContacts.length);
+    void e_getAll() {
+        String url = BASE_URL + "/getAll";
+        ResponseEntity<Contact[]> response = this.restTemplate.getForEntity(url, Contact[].class);
+        assertNotNull(response.getBody());
         System.out.println("All Contacts: ");
-        for (Contact c : allContacts) {
+        for (Contact c : response.getBody()) {
             System.out.println(c);
         }
     }

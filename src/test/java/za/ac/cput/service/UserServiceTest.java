@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserServiceTest {
 
     @Autowired
-    private static IUserService service;
+    private IUserService service;
 
     private static User user;
 

@@ -10,7 +10,6 @@ import java.util.List;
 @Service
 public class DiscountService implements IDiscountService{
 
-    @Autowired
     private DiscountRepository repository;
 
     public Discount create(Discount discount) {

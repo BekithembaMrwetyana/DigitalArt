@@ -23,7 +23,7 @@ public class Cart {
     @JoinColumn(name = "userId", referencedColumnName = "userId")
     private User user;
 
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cart", fetch = FetchType.EAGER)
     private List<CartItem> cartItems;
 
     protected Cart() {

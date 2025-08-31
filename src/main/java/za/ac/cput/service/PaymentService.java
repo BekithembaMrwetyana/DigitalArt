@@ -13,25 +13,31 @@ import za.ac.cput.repository.PaymentRepository;
 import java.util.List;
 
 @Service
-public class PaymentService {
-
-    @Autowired
-    public static IPaymentService service;
+public class PaymentService implements IPaymentService{
 
     public PaymentRepository repository;
 
+    public PaymentService(PaymentRepository repository) {
+        this.repository = repository;
+    }
+
+    @Override
     public Payment create(Payment payment) {
         return repository.save(payment);
     }
+    @Override
     public Payment read(Long paymentID) {
         return repository.findById(paymentID).orElse(null);
     }
+    @Override
     public Payment update(Payment payment) {
         return repository.save(payment);
     }
+    @Override
     public void delete(Long paymentID) {
         repository.deleteById(paymentID);
     }
+    @Override
     public List<Payment> getAll() {
         return repository.findAll();
     }

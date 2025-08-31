@@ -3,13 +3,14 @@ package za.ac.cput.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import za.ac.cput.domain.CartItem;
-import za.ac.cput.domain.Category;
-import za.ac.cput.domain.Product;
-import za.ac.cput.domain.User;
 import za.ac.cput.repository.CartItemRepository;
-import za.ac.cput.repository.CategoryRepository;
-import za.ac.cput.repository.ProductRepository;
-import za.ac.cput.repository.UserRepository;
+
+/*
+CartItemService.java
+CartItem service
+Author: Thandolwethu P MSELEKU(223162477)
+Date: 03 August 2025
+*/
 
 import java.util.List;
 
@@ -17,55 +18,15 @@ import java.util.List;
 public class CartItemService implements ICartItemService {
 
     private final CartItemRepository cartItemRepository;
-    private final UserRepository userRepository;
-    private final ProductRepository productRepository;
-    private final CategoryRepository categoryRepository;
 
-    @Autowired
-    public CartItemService(CartItemRepository cartItemRepository,
-                           UserRepository userRepository,
-                           ProductRepository productRepository,
-                           CategoryRepository categoryRepository) {
+    @Autowired // 🔑 constructor injection preferred
+    public CartItemService(CartItemRepository cartItemRepository) {
         this.cartItemRepository = cartItemRepository;
-        this.userRepository = userRepository;
-        this.productRepository = productRepository;
-        this.categoryRepository = categoryRepository;
     }
 
     @Override
     public CartItem create(CartItem cartItem) {
-
-        User user = cartItem.getUser();
-        if (user != null && user.getUserId() == null) {
-            user = userRepository.save(user);
-        }
-
-
-        Product product = cartItem.getProduct();
-        if (product != null) {
-            Category category = product.getCategory();
-            if (category != null && category.getCategoryId() == null) {
-                category = categoryRepository.save(category);
-                product = new Product.Builder()
-                        .copy(product)
-                        .setCategory(category)
-                        .build();
-            }
-
-            if (product.getProductID() == null) {
-                product = productRepository.save(product);
-            }
-        }
-
-        CartItem savedCartItem = new CartItem.Builder()
-                .setCart(cartItem.getCart())
-                .setProduct(product)
-                .setQuantity(cartItem.getQuantity())
-                .setPrice(cartItem.getPrice())
-                .setUser(user)
-                .build();
-
-        return cartItemRepository.save(savedCartItem);
+        return cartItemRepository.save(cartItem);
     }
 
     @Override
@@ -85,6 +46,6 @@ public class CartItemService implements ICartItemService {
 
     @Override
     public List<CartItem> getAll() {
-        return cartItemRepository.findAll();
+        return this.cartItemRepository.findAll();
     }
 }

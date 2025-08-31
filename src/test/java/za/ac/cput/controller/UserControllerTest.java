@@ -20,11 +20,11 @@ class UserControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    private static final String BASE_URL = "/user";
+    private static final String BASE_URL = "http://localhost:8080/ADP_Capstone_Project/user";
 
     @BeforeAll
     public static void setup() {
-        user = UserFactory.createUser("Smith", "Alice", "Alice@2025", "alice@example.com", "0712345678", "0823456789");
+        user = UserFactory.createUser("Alice", "Smith", "Alice@2025");
     }
 
     @Test
@@ -59,7 +59,6 @@ class UserControllerTest {
 
         ResponseEntity<User> response = this.restTemplate.getForEntity(BASE_URL + "/read/" + user.getUserId(), User.class);
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        //ResponseEntity<User> response = restTemplate.exchage(url, HttpMethod.PUT, new HttEntity<>(updateUser), User.class);
         assertNotNull(response.getBody());
         System.out.println("Updated: " + response.getBody());
     }

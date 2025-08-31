@@ -9,8 +9,6 @@ Date: 18 May 2025
 import za.ac.cput.domain.Category;
 import za.ac.cput.util.Helper;
 
-
-
 public class CategoryFactory {
 
     public static Category createCategory(String name, String description) {

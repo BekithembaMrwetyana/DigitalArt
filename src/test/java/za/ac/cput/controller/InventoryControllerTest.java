@@ -17,7 +17,7 @@ public class InventoryControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    private final String BASE_URL = "/inventory";
+    private static final String BASE_URL = "http://localhost:8080/ADP_Capstone_Project/inventory";
 
     private Product dummyProduct() {
         return new Product.Builder()
@@ -92,7 +92,6 @@ public class InventoryControllerTest {
                 BASE_URL + "/read/" + created.getInventoryID(),
                 Inventory.class
         );
-
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
