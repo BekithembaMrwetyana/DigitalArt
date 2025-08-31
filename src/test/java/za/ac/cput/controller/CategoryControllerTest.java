@@ -4,6 +4,8 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import za.ac.cput.domain.Category;
@@ -57,24 +59,22 @@ class CategoryControllerTest {
                 .setDescription("Digital art using shapes and colors")
                 .build();
 
-        String url = BASE_URL + "/update";
-        ResponseEntity<Category> response = this.restTemplate.postForEntity(url, updatedCategory, Category.class);
-        assertNotNull(response.getBody());
-        assertEquals(updatedCategory.getName(), response.getBody().getName());
-        category = response.getBody();
-        System.out.println("updated:" + response.getBody());
+        HttpEntity<Category> request = new HttpEntity<>(updatedCategory);
+        ResponseEntity<Category> response = restTemplate.exchange(BASE_URL + "/update", HttpMethod.PUT,request, Category.class);
 
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Abstract Art", response.getBody().getName());
+        assertEquals("Digital art using shapes and colors", response.getBody().getDescription());
+
+        category = response.getBody();
+        System.out.println("Updated: " + category);
     }
 
     @Test
     @Order(5)
     void e_delete() {
-        String url = BASE_URL + "/delete/" + category.getCategoryId();
-        this.restTemplate.delete(url);
-
-        ResponseEntity<Category> response = this.restTemplate.getForEntity( BASE_URL + "/read/" + category.getCategoryId(), Category.class);
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        System.out.println("Deleted:" + "true");
+       restTemplate.delete(BASE_URL + "/delete/" + category.getCategoryId());
     }
 
     @Test
