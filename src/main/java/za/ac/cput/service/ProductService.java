@@ -9,9 +9,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService implements IProductService {
@@ -22,11 +24,11 @@ public class ProductService implements IProductService {
     public ProductService(ProductRepository productRepository) {
         this.productRepository = productRepository;
     }
+
     // Helper method to generate unique filename
     private String generateUniqueFilename(MultipartFile file) {
         return UUID.randomUUID() + "_" + file.getOriginalFilename();
     }
-
 
     @Override
     public Product create(Product product) {
@@ -35,7 +37,8 @@ public class ProductService implements IProductService {
 
     @Override
     public Product read(Long id) {
-        return productRepository.findById(id).orElse(null);
+        Product product = productRepository.findById(id).orElse(null);
+        return product != null ? encodeImage(product) : null;
     }
 
     @Override
@@ -43,7 +46,8 @@ public class ProductService implements IProductService {
         if (product.getProductID() == null || !productRepository.existsById(product.getProductID())) {
             return null;
         }
-        return productRepository.save(product);
+        Product updated = productRepository.save(product);
+        return encodeImage(updated);
     }
 
     @Override
@@ -53,49 +57,44 @@ public class ProductService implements IProductService {
 
     @Override
     public List<Product> getAll() {
-        return productRepository.findAll();
+        return encodeImages(productRepository.findAll());
     }
-
-    // ---- Updated methods ----
 
     @Override
     public List<Product> getByCategoryId(Long categoryId) {
-        if (categoryId == null) {
-            return Collections.emptyList();
-        }
-        List<Product> products = productRepository.findAllByCategory_CategoryId(categoryId);
-        return products != null ? products : Collections.emptyList();
+        if (categoryId == null) return Collections.emptyList();
+        return encodeImages(productRepository.findAllByCategory_CategoryId(categoryId));
+    }
+
+    public List<Product> getProductsWithoutCategory() {
+        return encodeImages(productRepository.findAllByCategoryIsNull());
     }
 
     @Override
     public List<Product> searchByTitle(String keyword) {
-        if (keyword == null || keyword.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return productRepository.findByTitleContainingIgnoreCase(keyword);
+        if (keyword == null || keyword.isEmpty()) return Collections.emptyList();
+        return encodeImages(productRepository.findByTitleContainingIgnoreCase(keyword));
     }
 
     @Override
     public List<Product> filterByPrice(double minPrice, double maxPrice) {
-        return productRepository.findByPriceBetween(minPrice, maxPrice);
+        return encodeImages(productRepository.findByPriceBetween(minPrice, maxPrice));
     }
 
     @Override
     public List<Product> filterByMaxPrice(double maxPrice) {
-        return productRepository.findByPriceLessThanEqual(maxPrice);
+        return encodeImages(productRepository.findByPriceLessThanEqual(maxPrice));
     }
 
-    // Optional: get products without category for fallback
-    public List<Product> getProductsWithoutCategory() {
-        return productRepository.findAllByCategoryIsNull();
-    }
+    // ---------------- Image Upload ----------------
+    @Override
     public Product saveImage(Long productId, MultipartFile file) throws IOException {
-        Product product = read(productId);
+        Product product = productRepository.findById(productId).orElse(null);
         if (product == null) return null;
 
         String filename = generateUniqueFilename(file);
 
-        // Absolute path to the static/images folder
+        // Absolute path to static/images folder
         Path uploadDir = Paths.get("src/main/resources/static/images");
         Files.createDirectories(uploadDir);
 
@@ -104,9 +103,28 @@ public class ProductService implements IProductService {
 
         // Set relative URL for the frontend
         product.setImageUrl("/images/" + filename);
-        return update(product);
+        return encodeImage(update(product));
     }
 
+    // ---------------- Base64 Encoding ----------------
+    private Product encodeImage(Product product) {
+        if (product.getImageUrl() != null) {
+            try {
+                Path path = Paths.get("src/main/resources/static/images", product.getImageUrl().replace("/images/", ""));
+                if (Files.exists(path)) {
+                    byte[] bytes = Files.readAllBytes(path);
+                    product.setImage(Base64.getEncoder().encodeToString(bytes));
+                }
+            } catch (IOException e) {
+                product.setImage(null);
+            }
+        }
+        return product;
+    }
 
+    private List<Product> encodeImages(List<Product> products) {
+        return products.stream()
+                .map(this::encodeImage)
+                .collect(Collectors.toList());
+    }
 }
-

@@ -35,8 +35,8 @@ class ProductServiceTest {
     void setUp() {
         // Create categories
         category1 = new Category.Builder()
-                .setName("Portraits")
-                .setDescription("Portrait artworks")
+                .setName("3D")
+                .setDescription("3D artworks")
                 .build();
 
         category2 = new Category.Builder()
@@ -48,7 +48,7 @@ class ProductServiceTest {
         product1 = productService.create(
                 new Product.Builder()
                         .setCategory(category1)
-                        .setTitle("Portrait Art")
+                        .setTitle("Abstract Art")
                         .setDescription("Digital portrait of a person")
                         .setPrice(150.0)
                         .setImageUrl("/images/art5.jpeg")
@@ -147,35 +147,38 @@ class ProductServiceTest {
     @Test
     @Order(9)
     void testSaveImage() throws IOException {
+        // Ensure product exists
         Product product = productService.read(product1.getProductID());
-        assertNotNull(product, "Product should exist");
+        assertNotNull(product, "Product should exist before uploading image");
 
-        // Prepare the test imagePath From Content Root
+        // Prepare the test imagePath from resources
         Path path = Paths.get("src/main/resources/static/images/art1.jpeg");
         assertTrue(Files.exists(path), "Test image must exist at " + path.toAbsolutePath());
 
         // Create MultipartFile for simulation
         MultipartFile file = new MockMultipartFile(
                 "file",
-                "sample-art.jpeg",
+                "art1.jpeg",
                 "image/jpeg",
                 Files.readAllBytes(path)
         );
 
-        // Call the saveImage method
-        Product updated = productService.saveImage(product.getProductID(), file);
+        // Save the image using service
+        Product updatedProduct = productService.saveImage(product.getProductID(), file);
 
-        // Verify the image URL is set correctly
-        assertNotNull(updated.getImageUrl(), "Updated product should have an image URL");
-        assertTrue(updated.getImageUrl().contains("/images/"), "Image URL should contain '/images/'");
+        // Assertions
+        assertNotNull(updatedProduct, "Updated product should not be null");
+        assertNotNull(updatedProduct.getImageUrl(), "Image URL should be set after upload");
+        assertTrue(updatedProduct.getImageUrl().contains("art1.jpeg"), "Image URL should contain the uploaded filename");
 
-        // Optional: verify that the file was actually saved to disk
-        Path savedFilePath = Paths.get("src/main/resources/static" + updated.getImageUrl());
-        assertTrue(Files.exists(savedFilePath), "Uploaded image file should exist on disk");
+        // Check encoded Base64 image
+        assertNotNull(updatedProduct.getImage(), "Encoded Base64 image should not be null");
+        assertTrue(updatedProduct.getImage().startsWith("/9j"), "Encoded image should look like Base64 JPEG"); // JPEG files usually start with /9j
 
-        System.out.println("Image uploaded and updated: " + updated.getImageUrl());
+        // Print result for visibility
+        System.out.println("Saved Image URL: " + updatedProduct.getImageUrl());
+        System.out.println("Encoded Image (first 50 chars): " + updatedProduct.getImage().substring(0, 50));
     }
-
 
     @Test
     @Order(10)
