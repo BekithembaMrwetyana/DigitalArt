@@ -46,7 +46,7 @@ public class OrderService implements IOrderService {
 
     @Override
     public List<Order> getAllOrders() {
-        return List.of();
+        return repository.findAll();
     }
 
     @Override
