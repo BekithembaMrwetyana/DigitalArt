@@ -15,7 +15,7 @@ import java.util.List;
 class ContactServiceTest {
 
     @Autowired
-    private IContactService service;
+    private static IContactService service;
 
     private static Contact contact;
 

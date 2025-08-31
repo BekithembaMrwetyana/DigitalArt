@@ -17,11 +17,10 @@ public class CartService implements ICartService{
 
     private final CartRepository repository;
 
-    @Autowired   // ✅ constructor injection recommended
+    @Autowired
     public CartService(CartRepository repository) {
         this.repository = repository;
     }
-
     public Cart create(Cart cart) {
         return repository.save(cart);
     }

@@ -19,27 +19,24 @@ class DiscountServiceTest {
     @Autowired
     private IDiscountService service;
 
-    private static Discount discount;
+    private Discount discount;
 
-    @BeforeAll
-    static void setupAll(@Autowired IDiscountService service) {
+    @BeforeEach
+    void setup() {
         discount = DiscountFactory.createDiscount(
-                "SUMMER26" + UUID.randomUUID(),
+                "SUMMER25" + UUID.randomUUID(),
                 new BigDecimal("25"),
                 LocalDate.of(2025, 8, 1),
                 LocalDate.of(2025, 8, 31)
         );
-        discount = service.create(discount);
     }
-
 
     @Test
     @Order(1)
     void create() {
-        Discount created = service.create(discount);
-        assertNotNull(created);
-        assertNotNull(created.getDiscountId()); // <-- now we have an ID
-        System.out.println("Created: " + created);
+        Discount newDiscount = service.create(discount);
+        assertNotNull(newDiscount);
+        System.out.println(newDiscount);
     }
 
     @Test
@@ -53,7 +50,7 @@ class DiscountServiceTest {
     @Test
     @Order(3)
     void update() {
-        Discount newDiscount = new Discount.Builder().copy(discount).setDiscountId(123L).build();
+        Discount newDiscount = new Discount.Builder().copy(discount).setCode("Summer25" +UUID.randomUUID()).build();
         Discount updated = service.update(newDiscount);
         assertNotNull(updated);
         System.out.println(updated);

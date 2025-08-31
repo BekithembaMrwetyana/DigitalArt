@@ -3,6 +3,7 @@ package za.ac.cput.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import za.ac.cput.domain.Discount;
+import za.ac.cput.repository.ContactRepository;
 import za.ac.cput.repository.DiscountRepository;
 
 import java.util.List;
@@ -10,7 +11,12 @@ import java.util.List;
 @Service
 public class DiscountService implements IDiscountService{
 
-    private DiscountRepository repository;
+    private final DiscountRepository repository;
+
+    @Autowired
+    public DiscountService(DiscountRepository repository) {
+        this.repository = repository;
+    }
 
     public Discount create(Discount discount) {
         return repository.save(discount);

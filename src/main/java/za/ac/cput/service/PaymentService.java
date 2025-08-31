@@ -17,6 +17,7 @@ public class PaymentService implements IPaymentService{
 
     public PaymentRepository repository;
 
+    @Autowired
     public PaymentService(PaymentRepository repository) {
         this.repository = repository;
     }

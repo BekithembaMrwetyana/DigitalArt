@@ -28,7 +28,7 @@ class InventoryFactoryTest {
                 .build();
 
         assertNotNull(inventory);
-        assertEquals("inv-z", inventory.getInventoryID());
+        assertEquals("inv-001", inventory.getInventoryID());
         assertEquals(product, inventory.getProduct());
         assertEquals(quantity, inventory.getQuantity());
     }

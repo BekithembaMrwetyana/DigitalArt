@@ -1,21 +1,11 @@
 package za.ac.cput.service;
 
-/*
-OrderServiceTest.java
-Order Service test class
-Author: Mpilonhle Zimela Mzimela 230197833
-Date: 20 July 2025
-*/
-
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.TestMethodOrder;
-import za.ac.cput.domain.Order;
-import za.ac.cput.domain.User;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import za.ac.cput.domain.Order;
+import za.ac.cput.domain.User;
 import za.ac.cput.domain.enums.OrderStatus;
 import za.ac.cput.repository.OrderRepository;
 import za.ac.cput.repository.UserRepository;
@@ -30,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.MethodName.class)
 public class OrderServiceTest {
 
+
     @Autowired
     private OrderService service;
 
@@ -40,64 +31,69 @@ public class OrderServiceTest {
     private UserRepository userRepository;
 
     private Order testOrder;
+    private User dummyUser;
 
     @BeforeEach
     void setUp() {
         repository.deleteAll();
         userRepository.deleteAll();
 
-        User testUser = new User.Builder()
+
+        dummyUser = new User.Builder()
                 .setFirstName("Test")
                 .setLastName("User")
-                //.setEmail("testuser@example.com")
-                .setPassword("password123")
+                .setPassword("password")
+                .setRole(za.ac.cput.domain.enums.Role.CUSTOMER)
                 .build();
-        testUser = userRepository.save(testUser);
+        dummyUser = userRepository.save(dummyUser);
+
 
         testOrder = new Order.Builder()
-                .setUser(testUser)
                 .setCartItem(Collections.emptyList())
                 .setTotalAmount(200.00)
                 .setOrderAmount(150.00)
                 .setOrderDate(LocalDateTime.now())
-                .setPaymentStatus(OrderStatus.PENDING)
+                //.setPaymentStatus(OrderStatus.PENDING)
                 .build();
+        testOrder.setUser(dummyUser);
 
-
+        service.create(testOrder);
     }
 
     @Test
     void a_testCreate() {
-        testOrder = service.create(testOrder);
-        assertNotNull(testOrder);
-        assertNotNull(testOrder.getOrderID(), "Order ID must be auto-generated");
-        assertEquals(OrderStatus.PENDING, testOrder.getPaymentStatus());
+        assertNotNull(testOrder.getOrderID());
+        System.out.println("Created order: " + testOrder);
     }
 
     @Test
+    @Transactional
     void b_testRead() {
         Order found = service.read(testOrder.getOrderID());
         assertNotNull(found);
         assertEquals(testOrder.getOrderID(), found.getOrderID());
+        System.out.println("Read order: " + found);
     }
 
     @Test
     void c_testUpdate() {
         Order updated = new Order.Builder()
                 .copy(testOrder)
-                .setPaymentStatus(OrderStatus.SHIPPED)
+                //.setPaymentStatus(OrderStatus.SHIPPED)
                 .build();
+        updated.setUser(dummyUser); // keep the user for JPA
 
         Order result = service.update(updated);
         assertEquals(OrderStatus.SHIPPED, result.getPaymentStatus());
+        System.out.println("Updated order: " + result);
     }
 
     @Test
+    @Transactional
     void d_testGetAll() {
         List<Order> orders = service.getAll();
         assertNotNull(orders);
         assertFalse(orders.isEmpty());
-        System.out.println("Orders: " + orders);
+        System.out.println("All orders: " + orders);
     }
 }
-

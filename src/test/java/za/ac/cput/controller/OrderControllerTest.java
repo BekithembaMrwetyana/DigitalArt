@@ -1,12 +1,18 @@
 package za.ac.cput.controller;
+/*
+OrderControllerTest.java
+Order controller test class
+Author: Mpilonhle Zimela Mzimela 230197833
+Date: 15 July 2025
+*/
 
-import org.junit.jupiter.api.*;
+
+import za.ac.cput.domain.Order;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
-import za.ac.cput.domain.Cart;
-import za.ac.cput.domain.Order;
 import za.ac.cput.domain.enums.OrderStatus;
 
 import java.time.LocalDateTime;
@@ -15,84 +21,130 @@ import java.util.Collections;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class OrderControllerTest {
-
-    private static Order order;
+public class OrderControllerTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
 
-    private static final String BASE_URL = "http://localhost:8080/ADP_Capstone_Project/orders";
+    private final String BASE_URL = "/orders";
 
-    @BeforeAll
-    public static void setup() {
-        order = new Order.Builder()
-                .setOrderID(null) // Let the service generate ID
+    @Test
+    void testCreateOrder() {
+        Order order = new Order.Builder()
                 .setOrderAmount(120.0)
                 .setTotalAmount(150.0)
                 .setOrderDate(LocalDateTime.now())
                 .setCartItem(Collections.emptyList())
-                .setPaymentStatus(OrderStatus.PENDING)
-                .build();
-    }
-
-    @Test
-    void a_create() {
-        String url = BASE_URL + "/create";
-        ResponseEntity<Order> postResponse = this.restTemplate.postForEntity(url, order, Order.class);
-        assertNotNull(postResponse);
-        Order createdOrder = postResponse.getBody();
-
-        assertEquals(order.getOrderID(), createdOrder.getOrderID());
-        System.out.println("Created: " + createdOrder);
-    }
-
-    @Test
-    void b_read() {
-        String url = BASE_URL + "/read/" + order.getOrderID();
-        ResponseEntity<Order> response = this.restTemplate.getForEntity(url, Order.class);
-        assertNotNull(response.getBody());
-        assertEquals(order.getOrderID(), response.getBody().getOrderID());
-        System.out.println("Read: " + response.getBody());
-    }
-
-    @Test
-    void c_update() {
-        Order updatedOrder = new Order.Builder().copy(order)
-                .setPaymentStatus(OrderStatus.SHIPPED)
+                //.setPaymentStatus(OrderStatus.PENDING)
                 .build();
 
-        String url = BASE_URL + "/update";
-        this.restTemplate.put(url, updatedOrder);
+        ResponseEntity<Order> response = restTemplate.postForEntity(
+                BASE_URL + "/create", order, Order.class
+        );
 
-        ResponseEntity<Order> response = this.restTemplate.postForEntity(url, updatedOrder, Order.class);
-
-        assertEquals(response.getStatusCode(), HttpStatus.NOT_FOUND);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        //assertEquals(OrderStatus.SHIPPED, response.getBody().getPaymentStatus());
-        System.out.println("Updated: " + response.getBody());
+        assertNotNull(response.getBody().getOrderID());
+    }
+
+
+    @Test
+    void testReadOrder() {
+        Order order = new Order.Builder()
+                .setCartItem(Collections.emptyList())
+                .setTotalAmount(200.0)
+                .setOrderDate(LocalDateTime.now())
+                .setOrderAmount(150.0)
+                //.setPaymentStatus(OrderStatus.PENDING)
+                .build();
+
+        ResponseEntity<Order> createResponse = restTemplate.postForEntity(
+                BASE_URL + "/create", order, Order.class
+        );
+        Long generatedId = createResponse.getBody().getOrderID();
+
+        ResponseEntity<Order> response = restTemplate.getForEntity(
+                BASE_URL + "/read/" + generatedId, Order.class
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(generatedId, response.getBody().getOrderID());
+    }
+
+
+    @Test
+    void testUpdateOrder() {
+
+        Order order = new Order.Builder()
+                .setOrderID(103L)
+
+                .setCartItem(Collections.emptyList())
+                .setTotalAmount(250.0)
+                .setOrderDate(LocalDateTime.now())
+                .setOrderAmount(200.0)
+                //.setPaymentStatus(OrderStatus.PENDING)
+                .build();
+
+        restTemplate.postForEntity(BASE_URL + "/create", order, Order.class);
+
+
+        Order updatedOrder = new Order.Builder()
+                .copy(order)
+                //.setPaymentStatus(OrderStatus.SHIPPED)
+                .build();
+
+        HttpEntity<Order> request = new HttpEntity<>(updatedOrder);
+        ResponseEntity<Order> response = restTemplate.exchange(
+                BASE_URL + "/update/" + order.getOrderID(),
+                HttpMethod.PUT,
+                request,
+                Order.class
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(OrderStatus.SHIPPED , response.getBody().getPaymentStatus());
     }
 
     @Test
-    void d_getAll() {
-        String url = BASE_URL + "/getAll";
-        ResponseEntity<Order[]> response = this.restTemplate.getForEntity(url, Order[].class);
-        assertNotNull(response.getBody());
-        System.out.println("Get All:");
-        for (Order o : response.getBody()) {
-            System.out.println(o);
-        }
+    void testDeleteOrder() {
+
+        Order order = new Order.Builder()
+                .setOrderID(104L)
+                .setCartItem(Collections.emptyList())
+                .setTotalAmount(300.0)
+                .setOrderDate(LocalDateTime.now())
+                .setOrderAmount(200.0)
+                //.setPaymentStatus(OrderStatus.PENDING)
+                .build();
+
+        restTemplate.postForEntity(BASE_URL + "/create", order, Order.class);
+
+        ResponseEntity<Void> deleteResponse = restTemplate.exchange(
+                BASE_URL + "/delete/" + order.getOrderID(),
+                HttpMethod.DELETE,
+                null,
+                Void.class
+        );
+
+        assertEquals(HttpStatus.OK, deleteResponse.getStatusCode());;
+
+
+        ResponseEntity<Order> readResponse = restTemplate.getForEntity(
+                BASE_URL + "/read/" + order.getOrderID(),
+                Order.class
+        );
+        assertNull(readResponse.getBody());
     }
 
     @Test
-    void e_delete() {
-        String url = BASE_URL + "/delete/" + order.getOrderID();
-        this.restTemplate.delete(url);
+    void testGetAllOrders() {
+        ResponseEntity<Order[]> response = restTemplate.getForEntity(
+                BASE_URL + "/getAll", Order[].class
+        );
 
-        // Optional: check read returns 404
-        ResponseEntity<Order> response = this.restTemplate.getForEntity(BASE_URL + "/read/" + order.getOrderID(), Order.class);
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        System.out.println("Deleted:" + "true");
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
     }
 }
