@@ -3,6 +3,7 @@ package za.ac.cput.domain;
 import jakarta.persistence.*;
 
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /*
 Product.java
@@ -12,6 +13,7 @@ Date: 25 May 2025
 */
 @Entity
 @Table(name = "products")
+@JsonIgnoreProperties({"orderItems", "hibernateLazyInitializer"})
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,10 +23,11 @@ public class Product {
     private String title;
     private String description;
     private double price;
+    private String imageUrl; // stores relative pathway for images
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "category_id", nullable = true)
     private Category category;
 
     @OneToMany(mappedBy = "product")
@@ -39,6 +42,31 @@ public class Product {
         this.title = builder.title;
         this.description = builder.description;
         this.price = builder.price;
+        this.imageUrl = builder.imageUrl;
+    }
+    // Add these setter methods
+    public void setProductID(Long productID) {
+        this.productID = productID;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public Long getProductID() {
@@ -61,6 +89,8 @@ public class Product {
         return price;
     }
 
+    public String getImageUrl() { return imageUrl; }
+
     @Override
     public String toString() {
         return "Product{" +
@@ -69,6 +99,7 @@ public class Product {
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", price=" + price +
+                ", imageUrl='" + imageUrl + '\'' +
                 '}';
     }
 
@@ -78,6 +109,7 @@ public class Product {
         private String title;
         private String description;
         private double price;
+        private String imageUrl;
 
         public Builder setProductID(Long productID) {
             this.productID = productID;
@@ -103,6 +135,10 @@ public class Product {
             this.price = price;
             return this;
         }
+        public Builder setImageUrl(String imageUrl) {
+            this.imageUrl = imageUrl;
+            return this;
+        }
 
         public Builder copy(Product product) {
             this.productID = product.productID;
@@ -110,6 +146,7 @@ public class Product {
             this.title = product.title;
             this.description = product.description;
             this.price = product.price;
+            this.imageUrl = product.imageUrl;
             return this;
         }
 

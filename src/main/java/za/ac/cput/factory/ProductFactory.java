@@ -13,13 +13,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ProductFactory {
-    public Product create(Long productID, Category category, String title, String description, double price) {
+    public Product create(Long productID, Category category, String title, String description, double price, String imageFileName) {
         return new Product.Builder()
                 .setProductID(productID)
                 .setCategory(category)
                 .setTitle(title)
                 .setDescription(description)
                 .setPrice(price)
+                .setImageUrl("/images/" + imageFileName)
                 .build();
     }
 
