@@ -6,7 +6,12 @@ import za.ac.cput.domain.ArtBrand;
 import za.ac.cput.domain.CartItem;
 import za.ac.cput.service.ArtBrandService;
 import za.ac.cput.service.CartItemService;
-
+/*
+ArtbrandController
+ArtBrnadController class
+Author: Thandolwethu
+Date: 30 August 2025
+*/
 import java.util.List;
 
 @RestController
