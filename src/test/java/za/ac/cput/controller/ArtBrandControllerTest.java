@@ -10,6 +10,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import za.ac.cput.domain.ArtBrand;
 import za.ac.cput.factory.ArtBrandFactory;
 
+/*
+ArtbrandControllerTest
+ArtBrandControllerTest class
+Author: Thandolwethu Mseleku
+Date: 30 August 2025
+*/
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
