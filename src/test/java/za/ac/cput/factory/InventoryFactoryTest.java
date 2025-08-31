@@ -22,13 +22,13 @@ class InventoryFactoryTest {
         int quantity = 50;
 
         Inventory inventory = new Inventory.Builder()
-                .setInventoryID(25L)
+                //.setInventoryID(25L)
                 .setProduct(product)
                 .setQuantity(quantity)
                 .build();
 
         assertNotNull(inventory);
-        assertEquals("inv-001", inventory.getInventoryID());
+        assertEquals(100L, inventory.getInventoryID());
         assertEquals(product, inventory.getProduct());
         assertEquals(quantity, inventory.getQuantity());
     }
@@ -37,7 +37,7 @@ class InventoryFactoryTest {
     void testCreateInventoryWithInvalidProduct() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             new Inventory.Builder()
-                    .setInventoryID(20L)
+                    //.setInventoryID(20L)
                     .setProduct(null)
                     .setQuantity(10)
                     .build();
@@ -51,7 +51,7 @@ class InventoryFactoryTest {
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             new Inventory.Builder()
-                    .setInventoryID(26L)
+                    //.setInventoryID(26L)
                     .setProduct(product)
                     .setQuantity(-5)
                     .build();

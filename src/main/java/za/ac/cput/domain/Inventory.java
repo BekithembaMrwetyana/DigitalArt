@@ -11,8 +11,8 @@ public class Inventory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long inventoryID;
 
-    @OneToOne(cascade = CascadeType.ALL)
-
+    @ManyToOne
+    @JoinColumn(name = "product_product_id")
     private Product product;
 
     private int quantity;
