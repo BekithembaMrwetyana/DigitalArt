@@ -1,12 +1,5 @@
 package za.ac.cput.domain;
 
-/*
-User.java
-User POJO class
-Author: Luvo Nana 221376909
-Date: 08 May 2025
-*/
-
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,7 +11,6 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "userId")
     private Long userId;
 
     private String lastName;
@@ -30,11 +22,10 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "contact_email", referencedColumnName = "email")
-    private Contact contact;
+    private String email;
+    private String phoneNumber;
+    private String altNumber;
 
-    // Protected default constructor for JPA
     protected User() {}
 
     private User(Builder builder) {
@@ -45,10 +36,11 @@ public class User {
         this.role = builder.role;
         this.lastLogin = builder.lastLogin;
         this.createDate = builder.createDate;
-        this.contact = builder.contact;
+        this.email = builder.email;
+        this.phoneNumber = builder.phoneNumber;
+        this.altNumber = builder.altNumber;
     }
 
-    // ====== Getters ======
     public Long getUserId() { return userId; }
     public String getLastName() { return lastName; }
     public String getFirstName() { return firstName; }
@@ -56,9 +48,10 @@ public class User {
     public Role getRole() { return role; }
     public LocalDateTime getLastLogin() { return lastLogin; }
     public LocalDate getCreateDate() { return createDate; }
-    public Contact getContact() { return contact; }
+    public String getEmail() { return email; }
+    public String getPhoneNumber() { return phoneNumber; }
+    public String getAltNumber() { return altNumber; }
 
-    // ====== Setters ======
     public void setUserId(Long userId) { this.userId = userId; }
     public void setLastName(String lastName) { this.lastName = lastName; }
     public void setFirstName(String firstName) { this.firstName = firstName; }
@@ -66,23 +59,10 @@ public class User {
     public void setRole(Role role) { this.role = role; }
     public void setLastLogin(LocalDateTime lastLogin) { this.lastLogin = lastLogin; }
     public void setCreateDate(LocalDate createDate) { this.createDate = createDate; }
-    public void setContact(Contact contact) { this.contact = contact; }
+    public void setEmail(String email) { this.email = email; }
+    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+    public void setAltNumber(String altNumber) { this.altNumber = altNumber; }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "userId=" + userId +
-                ", lastName='" + lastName + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", password='" + password + '\'' +
-                ", role=" + role +
-                ", lastLogin=" + lastLogin +
-                ", createDate=" + createDate +
-                ", contact=" + contact +
-                '}';
-    }
-
-    // ====== Builder Pattern ======
     public static class Builder {
         private Long userId;
         private String lastName;
@@ -91,40 +71,20 @@ public class User {
         private Role role;
         private LocalDateTime lastLogin;
         private LocalDate createDate;
-        private Contact contact;
+        private String email;
+        private String phoneNumber;
+        private String altNumber;
 
-        public Builder setUserId(Long userId) {
-            this.userId = userId;
-            return this;
-        }
-        public Builder setLastName(String lastName) {
-            this.lastName = lastName;
-            return this;
-        }
-        public Builder setFirstName(String firstName) {
-            this.firstName = firstName;
-            return this;
-        }
-        public Builder setPassword(String password) {
-            this.password = password;
-            return this;
-        }
-        public Builder setRole(Role role) {
-            this.role = role;
-            return this;
-        }
-        public Builder setLastLogin(LocalDateTime lastLogin) {
-            this.lastLogin = lastLogin;
-            return this;
-        }
-        public Builder setCreateDate(LocalDate createDate) {
-            this.createDate = createDate;
-            return this;
-        }
-        public Builder setContact(Contact contact) {
-            this.contact = contact;
-            return this;
-        }
+        public Builder setUserId(Long userId) { this.userId = userId; return this; }
+        public Builder setLastName(String lastName) { this.lastName = lastName; return this; }
+        public Builder setFirstName(String firstName) { this.firstName = firstName; return this; }
+        public Builder setPassword(String password) { this.password = password; return this; }
+        public Builder setRole(Role role) { this.role = role; return this; }
+        public Builder setLastLogin(LocalDateTime lastLogin) { this.lastLogin = lastLogin; return this; }
+        public Builder setCreateDate(LocalDate createDate) { this.createDate = createDate; return this; }
+        public Builder setEmail(String email) { this.email = email; return this; }
+        public Builder setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; return this; }
+        public Builder setAltNumber(String altNumber) { this.altNumber = altNumber; return this; }
 
         public Builder copy(User user) {
             this.userId = user.userId;
@@ -134,11 +94,12 @@ public class User {
             this.role = user.role;
             this.lastLogin = user.lastLogin;
             this.createDate = user.createDate;
-            this.contact = user.contact;
+            this.email = user.email;
+            this.phoneNumber = user.phoneNumber;
+            this.altNumber = user.altNumber;
             return this;
         }
-        public User build() {
-            return new User(this);
-        }
+
+        public User build() { return new User(this); }
     }
 }
