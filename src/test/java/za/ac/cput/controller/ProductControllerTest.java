@@ -24,6 +24,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Transactional
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -167,6 +168,8 @@ class ProductControllerTest {
         assertTrue(response.getBody().getImageUrl().contains("/images/"), "Image URL should contain '/images/'");
 
         System.out.println("Uploaded Image: " + response.getBody().getImageUrl());
+
+
 
         // Update the product reference for future tests
         product = response.getBody();

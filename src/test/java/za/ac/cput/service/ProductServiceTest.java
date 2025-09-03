@@ -36,6 +36,7 @@ class ProductServiceTest {
     // Products
     private Product product1, product2, product3;
 
+
     @BeforeAll
     void setUp() {
 
