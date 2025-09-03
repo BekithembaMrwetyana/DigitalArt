@@ -1,6 +1,8 @@
 package za.ac.cput.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,7 +27,7 @@ public class Order {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", referencedColumnName = "userId", nullable = true)
-    @JsonIgnore
+    @JsonBackReference
     private User user;
 
     @Enumerated(EnumType.STRING)
@@ -64,7 +66,13 @@ public class Order {
     public void setId(Long id) {
         this.orderID = id;
     }
+    public void setPaymentStatus(OrderStatus paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
 
+    public void setCartItems(List<CartItem> cartItems) {
+        this.cartItems = cartItems;
+    }
 
     public List<CartItem> getCartItems() {
         return cartItems;
@@ -91,13 +99,21 @@ public class Order {
         return "Order{" +
                 "orderID=" + orderID +
 
-                //", cartItems=" + cartItems +
+                ", cartItems=" + cartItems +
                 ", totalAmount=" + totalAmount +
                 ", orderDate=" + orderDate +
                 " orderAmount=" + orderAmount +
 
                 ", paymentStatus=" + paymentStatus +
                 '}';
+    }
+
+    public void setOrderDate(LocalDateTime orderDate) {
+        this.orderDate = orderDate;
+    }
+
+    public void setCartItem(List<CartItem> cartItems) {
+        this.cartItems = cartItems;
     }
 
     public static class Builder {
