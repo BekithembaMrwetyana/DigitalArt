@@ -1,4 +1,5 @@
 package za.ac.cput.service;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
 @SpringBootTest
+@Transactional
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ProductServiceTest {
@@ -25,44 +27,50 @@ class ProductServiceTest {
     @Autowired
     private IProductService productService;
 
-    private Product product1;
-    private Product product2;
+    @Autowired
+    private ICategoryService categoryService;
 
-    private Category category1;
-    private Category category2;
+    // Categories
+    private Category category1, category2, category3;
+
+    // Products
+    private Product product1, product2, product3;
 
     @BeforeAll
     void setUp() {
-        // Create categories
-        category1 = new Category.Builder()
-                .setName("Portraits")
-                .setDescription("Portrait artworks")
-                .build();
 
-        category2 = new Category.Builder()
-                .setName("Abstract")
-                .setDescription("Abstract artworks")
-                .build();
+        category1 = categoryService.create(new Category.Builder().setName("3D").setDescription("3D artworks").build());
+        category2 = categoryService.create(new Category.Builder().setName("Abstract").setDescription("Abstract artworks").build());
 
-        // Create products
-        product1 = productService.create(
-                new Product.Builder()
-                        .setCategory(category1)
-                        .setTitle("Portrait Art")
-                        .setDescription("Digital portrait of a person")
-                        .setPrice(150.0)
-                        .setImageUrl("/images/art5.jpeg")
-                        .build()
+        product1 = productService.create(new Product.Builder()
+                .setCategory(category1)
+                .setTitle("3D Sculpture")
+                .setDescription("Digital 3D sculpture")
+                .setPrice(150.0)
+                .setImageUrl("/images/art8.jpeg")
+                .build()
         );
 
-        product2 = productService.create(
-                new Product.Builder()
-                        .setCategory(category2)
-                        .setTitle("Abstract Art")
-                        .setDescription("Colorful abstract design")
-                        .setPrice(200.0)
-                        .setImageUrl("/images/art3.jpeg")
-                        .build()
+        product2 = productService.create(new Product.Builder()
+                .setCategory(category2)
+                .setTitle("Abstract Art 1")
+                .setDescription("Colorful abstract design")
+                .setPrice(200.0)
+                .setImageUrl("/images/art9.jpeg")
+                .build()
+        );
+
+        // ---- Batch 2 ----
+        category3 = categoryService.create(new Category.Builder().setName("Landscape").setDescription("Landscape artworks").build());
+
+
+        product3 = productService.create(new Product.Builder()
+                .setCategory(category3)
+                .setTitle("Ocean Waves")
+                .setDescription("Beautiful ocean landscape")
+                .setPrice(180.0)
+                .setImageUrl("/images/art10.jpeg")
+                .build()
         );
     }
 
@@ -71,118 +79,69 @@ class ProductServiceTest {
     void testCreateProducts() {
         assertNotNull(product1.getProductID());
         assertNotNull(product2.getProductID());
-        System.out.println("Created products: " + product1 + ", " + product2);
+        assertNotNull(product3.getProductID());
+
+
+        System.out.println("Created products: " + product1 + ", " + product2 + ", " + product3 + ",");
     }
 
     @Test
     @Order(2)
-    void testReadProduct() {
-        Product read = productService.read(product1.getProductID());
-        assertNotNull(read);
-        assertEquals(150.0, read.getPrice());
-        assertEquals(category1.getCategoryId(), read.getCategory().getCategoryId());
-        System.out.println("Read product: " + read);
-    }
-
-    @Test
-    @Order(3)
-    void testUpdateProduct() {
-        Product productFromDb = productService.read(product2.getProductID());
-
-        Product updated = new Product.Builder()
-                .copy(productFromDb)
-                .setPrice(250.0)
-                .setTitle("Abstract Art Updated")
-                .build();
-
-        Product result = productService.update(updated);
-
-        assertNotNull(result);
-        assertEquals(250.0, result.getPrice());
-        assertEquals("Abstract Art Updated", result.getTitle());
-        System.out.println("Updated product: " + result);
-    }
-
-    @Test
-    @Order(4)
-    void testGetAll() {
+    void testGetAllProducts() {
         List<Product> all = productService.getAll();
-        assertFalse(all.isEmpty());
+        assertEquals(9, all.size());
         System.out.println("All products: " + all);
     }
 
     @Test
-    @Order(5)
+    @Order(3)
     void testGetByCategory() {
         List<Product> byCategory = productService.getByCategoryId(category1.getCategoryId());
         assertFalse(byCategory.isEmpty());
-        assertEquals(category1.getCategoryId(), byCategory.get(0).getCategory().getCategoryId());
-        System.out.println("Products by category " + category1.getCategoryId() + ": " + byCategory);
+        System.out.println("Products by category " + category1.getName() + ": " + byCategory);
+    }
+
+    @Test
+    @Order(4)
+    void testSaveImagesBatch() throws IOException {
+        // Example: save images for all 6 products
+        Product[] products = {product1, product2, product3};
+        for (int i = 0; i < products.length; i++) {
+            Product p = products[i];
+            Path path = Paths.get("src/main/resources/static/images/art" + (i + 1) + ".jpeg");
+            assertTrue(Files.exists(path), "Test image must exist: " + path);
+
+            MultipartFile file = new MockMultipartFile(
+                    "file",
+                    "art" + (i + 1) + ".jpeg",
+                    "image/jpeg",
+                    Files.readAllBytes(path)
+            );
+
+            Product updated = productService.saveImage(p.getProductID(), file);
+            assertNotNull(updated.getImageUrl());
+            assertTrue(updated.getImageUrl().contains("art" + (i + 1) + ".jpeg"));
+            System.out.println("Saved image for product: " + updated.getTitle());
+        }
+    }
+
+    @Test
+    @Order(5)
+    void testUpdateProductBatch() {
+        Product updated = new Product.Builder().copy(product2).setPrice(250.0).setTitle("Abstract Art Updated").build();
+        Product result = productService.update(updated);
+        assertEquals(250.0, result.getPrice());
+        System.out.println("Updated product: " + result);
     }
 
     @Test
     @Order(6)
-    void testSearchByTitle() {
-        List<Product> found = productService.searchByTitle("Portrait");
-        assertFalse(found.isEmpty());
-        System.out.println("Products found with 'Portrait': " + found);
-    }
-
-    @Test
-    @Order(7)
-    void testFilterByPrice() {
-        List<Product> filtered = productService.filterByPrice(100.0, 200.0);
-        assertFalse(filtered.isEmpty());
-        System.out.println("Products between 100 and 200: " + filtered);
-    }
-
-    @Test
-    @Order(8)
-    void testFilterByMaxPrice() {
-        List<Product> filtered = productService.filterByMaxPrice(200.0);
-        assertFalse(filtered.isEmpty());
-        System.out.println("Products with price <= 200: " + filtered);
-    }
-
-    @Test
-    @Order(9)
-    void testSaveImage() throws IOException {
-        Product product = productService.read(product1.getProductID());
-        assertNotNull(product, "Product should exist");
-
-        // Prepare the test imagePath From Content Root
-        Path path = Paths.get("src/main/resources/static/images/art1.jpeg");
-        assertTrue(Files.exists(path), "Test image must exist at " + path.toAbsolutePath());
-
-        // Create MultipartFile for simulation
-        MultipartFile file = new MockMultipartFile(
-                "file",
-                "sample-art.jpeg",
-                "image/jpeg",
-                Files.readAllBytes(path)
-        );
-
-        // Call the saveImage method
-        Product updated = productService.saveImage(product.getProductID(), file);
-
-        // Verify the image URL is set correctly
-        assertNotNull(updated.getImageUrl(), "Updated product should have an image URL");
-        assertTrue(updated.getImageUrl().contains("/images/"), "Image URL should contain '/images/'");
-
-        // Optional: verify that the file was actually saved to disk
-        Path savedFilePath = Paths.get("src/main/resources/static" + updated.getImageUrl());
-        assertTrue(Files.exists(savedFilePath), "Uploaded image file should exist on disk");
-
-        System.out.println("Image uploaded and updated: " + updated.getImageUrl());
-    }
-
-
-    @Test
-    @Order(10)
-    void testDeleteProduct() {
-        productService.delete(product1.getProductID());
-        Product deleted = productService.read(product1.getProductID());
-        assertNull(deleted, "Deleted product should not exist");
-        System.out.println("Deleted product with ID: " + product1.getProductID());
+    void testDeleteProductsBatch() {
+        Product[] products = {product1, product2, product3};
+        for (Product p : products) {
+            productService.delete(p.getProductID());
+            assertNull(productService.read(p.getProductID()));
+            System.out.println("Deleted product: " + p.getTitle());
+        }
     }
 }

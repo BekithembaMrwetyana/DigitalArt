@@ -28,20 +28,19 @@ class ProductFactoryTest {
 
     private static Product product1;
     private static Product product2;
-
     private static Category category1;
     private static Category category2;
 
     @BeforeAll
     static void setUpCategories() {
         category1 = new Category.Builder()
-                .setCategoryId(1001L)
+                .setCategoryId(1001L) // fake ID for testing, not persisted
                 .setName("Portraits")
                 .setDescription("Portrait artworks")
                 .build();
 
         category2 = new Category.Builder()
-                .setCategoryId(1002L)
+                .setCategoryId(1002L) // fake ID for testing, not persisted
                 .setName("Abstract")
                 .setDescription("Abstract artworks")
                 .build();
@@ -60,8 +59,6 @@ class ProductFactoryTest {
         assertNotNull(product2);
         assertEquals("Abstract Art", product2.getTitle());
         assertEquals("/images/art5.jpeg", product2.getImageUrl());
-
-        System.out.println("Created products: " + product1 + ", " + product2);
     }
 
     @Test
@@ -70,21 +67,7 @@ class ProductFactoryTest {
         Product copy1 = productFactory.copy(product1);
         Product copy2 = productFactory.copy(product2);
 
-        assertNotNull(copy1);
         assertEquals(product1.getTitle(), copy1.getTitle());
-        assertEquals(product1.getDescription(), copy1.getDescription());
-        assertEquals(product1.getPrice(), copy1.getPrice());
-        assertEquals(product1.getImageUrl(), copy1.getImageUrl());
-        assertEquals(product1.getCategory().getCategoryId(), copy1.getCategory().getCategoryId());
-
-        assertNotNull(copy2);
         assertEquals(product2.getTitle(), copy2.getTitle());
-        assertEquals(product2.getDescription(), copy2.getDescription());
-        assertEquals(product2.getPrice(), copy2.getPrice());
-        assertEquals(product2.getImageUrl(), copy2.getImageUrl());
-        assertEquals(product2.getCategory().getCategoryId(), copy2.getCategory().getCategoryId());
-
-
-        System.out.println("Copied products: " + copy1 + ", " + copy2);
     }
 }

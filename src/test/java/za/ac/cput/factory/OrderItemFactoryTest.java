@@ -1,8 +1,5 @@
 package za.ac.cput.factory;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import za.ac.cput.domain.Category;
@@ -23,10 +20,21 @@ class OrderItemFactoryTest {
 
     private static Product product;
     private static OrderItem orderItem;
+    private static Category category;
+
+    @BeforeAll
+    static void setUpCategory() {
+        category = new Category.Builder()
+                .setCategoryId(101L)
+                .setName("Digital Art")
+                .setDescription("All digital artworks")
+                .build();
+    }
 
     @Test
     @Order(1)
     void a_createProduct() {
+<<<<<<< HEAD
         product = productFactory.create(
                 1L,
                 new Category.Builder()
@@ -38,12 +46,12 @@ class OrderItemFactoryTest {
                 "High resolution digital portrait",
                 150.0,"Image1"
         );
+=======
+        product = productFactory.create(1L, category, "Portrait Art", "Digital portrait", 150.0, "portrait1.jpg");
+>>>>>>> f4960f5feb3b10bde06d7ae53c265dd2644e9506
 
         assertNotNull(product);
-        assertEquals("Portrait Art", product.getTitle());
-        assertEquals(150.0, product.getPrice());
-        assertEquals(101L, product.getCategory().getCategoryId());
-        System.out.println("Created product: " + product);
+        assertEquals("/images/portrait1.jpg", product.getImageUrl());
     }
 
     @Test
@@ -53,8 +61,9 @@ class OrderItemFactoryTest {
 
         assertNotNull(orderItem);
         assertEquals(3, orderItem.getQuantity());
-        assertEquals(product.getProductID(), orderItem.getProduct().getProductID());
-        System.out.println("Created order item: " + orderItem);
+        assertEquals(150.0, orderItem.getUnitPrice());
+        assertEquals(450.0, orderItem.getSubTotal());
+        assertEquals("/images/portrait1.jpg", orderItem.getProduct().getImageUrl());
     }
 
     @Test
@@ -64,7 +73,7 @@ class OrderItemFactoryTest {
 
         assertNotNull(copy);
         assertEquals(orderItem.getQuantity(), copy.getQuantity());
-        assertEquals(orderItem.getProduct().getTitle(), copy.getProduct().getTitle());
-        System.out.println("Copied order item: " + copy);
+        assertEquals(orderItem.getSubTotal(), copy.getSubTotal());
+        assertEquals(orderItem.getProduct().getImageUrl(), copy.getProduct().getImageUrl());
     }
 }
