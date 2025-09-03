@@ -6,6 +6,7 @@ Author: Bekithemba Mrwetyana (222706066)
 Date: 7 May 2025
 */
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import za.ac.cput.domain.Payment;
 import org.springframework.stereotype.Service;
 import za.ac.cput.repository.PaymentRepository;
@@ -43,4 +44,7 @@ public class PaymentService implements IPaymentService{
         return repository.findAll();
     }
 
+//    public List<Payment> findByUser() {
+//        return repository.findByOrderUserId(userId);
+//    }
 }

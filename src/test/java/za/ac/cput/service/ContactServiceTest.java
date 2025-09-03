@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @SpringBootTest
@@ -21,7 +22,7 @@ class ContactServiceTest {
 
     @BeforeAll
     static void setUp() {
-        contact = ContactFactory.createContact("Oliver", "Stone", "0711112222");
+        contact = ContactFactory.createContact("0626737836", "", LocalDate.now(), "");
 
     }
 

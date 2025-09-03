@@ -1,6 +1,7 @@
 package za.ac.cput.controller;
 
 import za.ac.cput.domain.User;
+import za.ac.cput.domain.enums.Role;
 import za.ac.cput.factory.UserFactory;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -24,7 +28,7 @@ class UserControllerTest {
 
     @BeforeAll
     public static void setup() {
-        user = UserFactory.createUser("Smith", "Alice", "Alice@2025", "alice@example.com", "0712345678", "0823456789");
+        user = UserFactory.createUser("Jon", "doe", "doe123", LocalDateTime.now(), LocalDate.now(), Role.CUSTOMER, "", "", "");
     }
 
     @Test

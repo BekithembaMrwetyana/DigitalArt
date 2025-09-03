@@ -29,7 +29,7 @@ class PaymentControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    private static final String BASE_URL = "https://localhost:8080/payment";
+    private static final String BASE_URL = "https://localhost:8080/ADP_Capstone_Project/payment";
 
     public static void setup(){
         Order order = new Order.Builder()

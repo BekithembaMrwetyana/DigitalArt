@@ -14,13 +14,13 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface    CartItemRepository extends JpaRepository<CartItem, Long> {
+public interface CartItemRepository extends JpaRepository<CartItem, Long> {
+
+    List<CartItem> findByUser_UserId(Long userId);
 
     List<CartItem> findByCart(Cart cart);
 
-
     List<CartItem>findByProduct(Product product);
-
 
     List<CartItem> findByQuantityGreaterThan(int quantity);
 }

@@ -4,8 +4,8 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import za.ac.cput.domain.User;
+import za.ac.cput.domain.enums.Role;
 import za.ac.cput.factory.UserFactory;
-
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,17 +14,26 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@TestMethodOrder(MethodOrderer.MethodName.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class UserServiceTest {
 
     @Autowired
-    private static IUserService service;
+    private IUserService service;
 
     private static User user;
-
     @BeforeAll
     static void setUp() {
-        user = UserFactory.createUser("Doe", "John", "Password123", "john.doe@example.com", "0741234567", "0219876543");
+        user = UserFactory.createUser(
+                "Doe",
+                "John",
+                "Password123",
+                LocalDateTime.now(),
+                LocalDate.now(),
+                Role.ADMIN,
+                "johndoe123@gmail.com",
+                "0789037859",
+                "0647824672"
+        );
     }
 
     @Test
@@ -32,6 +41,7 @@ class UserServiceTest {
     void a_create() {
         User created = service.create(user);
         assertNotNull(created);
+        assertNotNull(created.getUserId());
         user = created;
         System.out.println("Created: " + created);
     }
@@ -56,15 +66,18 @@ class UserServiceTest {
 
         User updated = service.update(updatedUser);
         assertNotNull(updated);
+        assertEquals("Jonathan", updated.getFirstName());
+        user = updated;
         System.out.println("Updated: " + updated);
     }
 
     @Test
     @Order(4)
     void d_delete() {
-//        boolean deleted = service.delete(user.getUserId());
-//        assertTrue(deleted);
-//        System.out.println("Deleted User ID: " + user.getUserId());
+        service.delete(user.getUserId());
+        User deletedUser = service.read(user.getUserId());
+        assertNull(deletedUser);
+        System.out.println("Deleted User ID: " + user.getUserId());
     }
 
     @Test

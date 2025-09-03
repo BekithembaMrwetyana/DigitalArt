@@ -37,7 +37,7 @@ class CartItemControllerTest {
     @Autowired
     private CartItemService cartItemService;
 
-    private final String baseUrl = "http://localhost:8080/ADP3_Capstone_Project/cart_item";
+    private final String baseUrl = "http://localhost:8080/cart_item";
 
     private User savedUser;
     private Cart savedCart;

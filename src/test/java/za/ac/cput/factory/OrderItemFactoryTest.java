@@ -36,7 +36,7 @@ class OrderItemFactoryTest {
                         .build(),
                 "Portrait Art",
                 "High resolution digital portrait",
-                150.0
+                150.0,"Image1"
         );
 
         assertNotNull(product);
