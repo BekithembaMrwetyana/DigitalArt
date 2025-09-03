@@ -7,8 +7,6 @@ import za.ac.cput.domain.User;
 import za.ac.cput.domain.enums.Role;
 import za.ac.cput.factory.UserFactory;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,7 +18,14 @@ class UserServiceTest {
     @Autowired
     private IUserService service;
 
-    private static User user;
+    private static User user = UserFactory.createUser(
+            "Doe",
+            "John",
+            "Password123",
+            Role.ADMIN,
+            "johndoe123@gmail.com",
+            "0789037859"
+    );
 
     @BeforeAll
     static void setUp() {
@@ -28,12 +33,9 @@ class UserServiceTest {
                 "Doe",
                 "John",
                 "Password123",
-                LocalDateTime.now(),
-                LocalDate.now(),
                 Role.ADMIN,
                 "johndoe123@gmail.com",
-                "0789037859",
-                "0647824672"
+                "0789037859"
         );
         assertNotNull(user);
     }
@@ -61,7 +63,6 @@ class UserServiceTest {
         User updatedUser = new User.Builder()
                 .copy(user)
                 .setFirstName("Jonathan")
-                .setLastLogin(LocalDateTime.now())
                 .build();
 
         User updated = service.update(updatedUser);

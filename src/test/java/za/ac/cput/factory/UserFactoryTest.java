@@ -17,22 +17,18 @@ class UserFactoryTest {
                 "Doe",
                 "John",
                 "Password123",
-                LocalDateTime.now(),
-                LocalDate.now(),
                 Role.ADMIN,
                 "johndoe@example.com",
-                "0123456789",
-                "0987654321"
+                "0123456789"
         );
 
         assertNotNull(user);
-        assertEquals("Doe", user.getLastName());
         assertEquals("John", user.getFirstName());
+        assertEquals("Doe", user.getLastName());
         assertEquals("Password123", user.getPassword());
         assertEquals(Role.ADMIN, user.getRole());
         assertEquals("johndoe@example.com", user.getEmail());
         assertEquals("0123456789", user.getPhoneNumber());
-        assertEquals("0987654321", user.getAltNumber());
     }
 
     @Test
@@ -41,10 +37,7 @@ class UserFactoryTest {
                 null,
                 "",
                 null,
-                LocalDateTime.now(),
-                LocalDate.now(),
                 Role.CUSTOMER,
-                "",
                 "",
                 ""
         );
@@ -57,12 +50,9 @@ class UserFactoryTest {
                 "Smith",
                 "Alice",
                 "pass123",
-                LocalDateTime.now(),
-                LocalDate.now(),
                 Role.CUSTOMER,
                 "alice@example.com",
-                "1234",
-                ""
+                "1234"
         );
         assertNull(user);
     }

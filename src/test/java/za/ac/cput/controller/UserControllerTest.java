@@ -10,8 +10,6 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -32,12 +30,9 @@ class UserControllerTest {
                 "Jon",
                 "Doe",
                 "doe123",
-                LocalDateTime.now(),
-                LocalDate.now(),
                 Role.CUSTOMER,
                 "jon@example.com",
-                "0123456789",
-                "0987654321"
+                "0123456789"
         );
     }
 
