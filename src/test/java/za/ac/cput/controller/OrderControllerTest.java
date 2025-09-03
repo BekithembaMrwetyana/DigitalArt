@@ -26,7 +26,7 @@ public class OrderControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    private final String BASE_URL = "/orders";
+    private final String BASE_URL = "/api/orders";;
 
     @Test
     void testCreateOrder() {

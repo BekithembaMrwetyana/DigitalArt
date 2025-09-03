@@ -10,6 +10,7 @@ Date: 27 May 2025
 import za.ac.cput.domain.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import za.ac.cput.domain.enums.OrderStatus;
 import za.ac.cput.repository.OrderRepository;
 
 import java.util.List;
@@ -38,6 +39,16 @@ public class OrderService implements IOrderService {
     public Order update(Order order) {
         return repository.save(order);
     }
+
+    public Order updateStatus(Long id, OrderStatus status) {
+        Order order = repository.findById(id).orElse(null);
+        if (order == null) return null;
+        order.setPaymentStatus(status);
+        return repository.save(order);
+    }
+
+
+
 
     @Override
     public void delete(Long orderID) {

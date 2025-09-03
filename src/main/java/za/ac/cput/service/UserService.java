@@ -1,8 +1,8 @@
 package za.ac.cput.service;
 
-import za.ac.cput.domain.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import za.ac.cput.domain.User;
+import za.ac.cput.domain.enums.Role;
 import za.ac.cput.repository.UserRepository;
 
 import java.util.List;
@@ -12,13 +12,21 @@ public class UserService implements IUserService {
 
     private final UserRepository repository;
 
-    @Autowired
     public UserService(UserRepository repository) {
         this.repository = repository;
     }
 
     @Override
     public User create(User user) {
+        User existingUser = getByEmail(user.getEmail());
+        if (existingUser != null) {
+            throw new IllegalArgumentException("Email is already in use: " + user.getEmail());
+        }
+
+        if (user.getRole() == null) {
+            user.setRole(Role.CUSTOMER);
+        }
+
         return repository.save(user);
     }
 
@@ -40,5 +48,13 @@ public class UserService implements IUserService {
     @Override
     public List<User> getAll() {
         return repository.findAll();
+    }
+
+    public User getByEmail(String email) {
+        return repository.findAll()
+                .stream()
+                .filter(u -> u.getEmail() != null && u.getEmail().equalsIgnoreCase(email))
+                .findFirst()
+                .orElse(null);
     }
 }

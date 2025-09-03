@@ -21,6 +21,7 @@ class UserServiceTest {
     private IUserService service;
 
     private static User user;
+
     @BeforeAll
     static void setUp() {
         user = UserFactory.createUser(
@@ -34,6 +35,7 @@ class UserServiceTest {
                 "0789037859",
                 "0647824672"
         );
+        assertNotNull(user);
     }
 
     @Test
@@ -43,7 +45,6 @@ class UserServiceTest {
         assertNotNull(created);
         assertNotNull(created.getUserId());
         user = created;
-        System.out.println("Created: " + created);
     }
 
     @Test
@@ -52,7 +53,6 @@ class UserServiceTest {
         User read = service.read(user.getUserId());
         assertNotNull(read);
         assertEquals(user.getUserId(), read.getUserId());
-        System.out.println("Read: " + read);
     }
 
     @Test
@@ -60,15 +60,14 @@ class UserServiceTest {
     void c_update() {
         User updatedUser = new User.Builder()
                 .copy(user)
-                .setLastLogin(LocalDateTime.now())
                 .setFirstName("Jonathan")
+                .setLastLogin(LocalDateTime.now())
                 .build();
 
         User updated = service.update(updatedUser);
         assertNotNull(updated);
         assertEquals("Jonathan", updated.getFirstName());
         user = updated;
-        System.out.println("Updated: " + updated);
     }
 
     @Test
@@ -77,7 +76,6 @@ class UserServiceTest {
         service.delete(user.getUserId());
         User deletedUser = service.read(user.getUserId());
         assertNull(deletedUser);
-        System.out.println("Deleted User ID: " + user.getUserId());
     }
 
     @Test
@@ -85,6 +83,12 @@ class UserServiceTest {
     void e_getAll() {
         List<User> allUsers = service.getAll();
         assertNotNull(allUsers);
-        System.out.println("All Users: " + allUsers);
+    }
+
+    @Test
+    @Order(6)
+    void f_verifyEmailPhoneSaved() {
+        User savedUser = service.read(user.getUserId());
+        assertNull(savedUser);
     }
 }
