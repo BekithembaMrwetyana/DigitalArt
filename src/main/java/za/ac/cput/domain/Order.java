@@ -16,10 +16,10 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderID;
 
-   @Column(updatable = false)
+    @Column(updatable = false)
     private double totalAmount;
     @Column(updatable = false)
-   private double orderAmount;
+    private double orderAmount;
     private LocalDateTime orderDate;
 
     @Embedded
@@ -58,7 +58,6 @@ public class Order {
         this.orderAmount = builder.orderAmount;
         this.paymentStatus = builder.paymentStatus;
     }
-
     public Long getOrderID() {
         return orderID;
     }
@@ -88,7 +87,6 @@ public class Order {
     public LocalDateTime getOrderDate() {
         return orderDate;
     }
-
 
     public OrderStatus getPaymentStatus() {
         return paymentStatus;
@@ -124,8 +122,6 @@ public class Order {
         private double totalAmount;
         private double orderAmount;
         private LocalDateTime orderDate;
-
-
         private OrderStatus paymentStatus;
         private List<CartItem> cartItems;
         private User user;
@@ -150,17 +146,12 @@ public class Order {
             this.orderDate = orderDate;
             return this;
         }
+
         public Builder setOrderAmount(double orderAmount) {
             this.orderAmount = orderAmount;
             return this;
         }
 
-
-
-        public Builder setPaymentStatus(OrderStatus paymentStatus) {
-            this.paymentStatus = paymentStatus;
-            return this;
-        }
 
         public Builder copy(Order order) {
             this.orderID = order.orderID;
@@ -179,8 +170,6 @@ public class Order {
             order.user = this.user;
             return order;
             //return new Order(this);
-
-
         }
     }
 }

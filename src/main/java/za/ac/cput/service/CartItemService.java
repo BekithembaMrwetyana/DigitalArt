@@ -87,4 +87,9 @@ public class CartItemService implements ICartItemService {
     public List<CartItem> getAll() {
         return cartItemRepository.findAll();
     }
+
+    public List<CartItem> findByUserId(Long userId) {
+        return cartItemRepository.findByUser_UserId(userId);
+    }
+
 }

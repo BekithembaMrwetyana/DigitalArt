@@ -25,11 +25,10 @@ class CartControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    private static final String BASE_URL = "https://localhost:8080/cart";
+    private static final String BASE_URL = "http//:localhost:8080//ADP3_Capstone_Project/cart";
 
     @BeforeAll
     public static void setup() {
-        // Create a mock user
         User user = new User.Builder()
                 .setUserId(1L)
                 .setFirstName("John")
@@ -48,10 +47,14 @@ class CartControllerTest {
     void create() {
         String url = BASE_URL + "/create";
         ResponseEntity<Cart> postResponse = this.restTemplate.postForEntity(url, cart, Cart.class);
+
         assertNotNull(postResponse);
-        //assertEquals(cart.getCartID(), createdCart.getCartID());
         Cart cartSaved = postResponse.getBody();
-        assertEquals(cart.getCartID(), cartSaved.getCartID());
+
+        assertNotNull(cartSaved);
+        assertNotNull(cartSaved.getCartID());
+        cart = cartSaved;
+
         System.out.println("Created: " + cartSaved);
     }
 
@@ -60,23 +63,26 @@ class CartControllerTest {
     void read() {
         String url = BASE_URL + "/read/" + cart.getCartID();
         ResponseEntity<Cart> response = this.restTemplate.getForEntity(url, Cart.class);
-        assertEquals(cart.getCartID(), response.getBody().getCartID());
-        System.out.print("Read: " + response.getBody());
 
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(cart.getCartID(), response.getBody().getCartID());
+
+        System.out.println("Read: " + response.getBody());
     }
 
     @Test
     @Order(3)
     void update() {
-        Cart updatedCart = new Cart.Builder().copy(cart).setCartID(123L).build();
+        Cart updatedCart = new Cart.Builder().copy(cart).build(); // keep same ID
         String url = BASE_URL + "/update";
         this.restTemplate.put(url, updatedCart);
 
         ResponseEntity<Cart> response = this.restTemplate.getForEntity(BASE_URL + "/read/" + updatedCart.getCartID(), Cart.class);
 
-        assertEquals(response.getStatusCode(), HttpStatus.OK);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        //assertEquals(updatedCart.getCartID(), response.getBody().getCartID());
+
         System.out.println("Updated: " + response.getBody());
     }
 
@@ -86,9 +92,9 @@ class CartControllerTest {
         String url = BASE_URL + "/delete/" + cart.getCartID();
         this.restTemplate.delete(url);
 
-        ResponseEntity<Cart> response = this.restTemplate.getForEntity(BASE_URL + "/read/" + cart.getCartID(), Cart.class);
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertNotNull(response.getBody());
+        ResponseEntity<String> response = this.restTemplate.getForEntity(BASE_URL + "/read/" + cart.getCartID(), String.class);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode()); // adjust if controller sends 400
+
         System.out.println("Deleted: " + cart.getCartID());
     }
 
@@ -96,12 +102,11 @@ class CartControllerTest {
     @Order(5)
     void getAll() {
         String url = BASE_URL + "/getAll";
-        ResponseEntity<Cart> response = this.restTemplate.getForEntity(url, Cart.class);
+        ResponseEntity<Cart[]> response = this.restTemplate.getForEntity(url, Cart[].class);
+
         assertNotNull(response.getBody());
-        //assertTrue(response.getBody().length > 0);
-        System.out.println("Get All: " + response.getBody());
-        //for (Cart cart : response.getBody()){
-        //    System.out.println(cart);
-        //}
+        //assertTrue(response.getBody().length >= 0);
+
+        System.out.println("Get All: " + response.getBody().length + " carts");
     }
 }

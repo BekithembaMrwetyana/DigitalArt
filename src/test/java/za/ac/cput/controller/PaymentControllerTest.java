@@ -1,7 +1,9 @@
 package za.ac.cput.controller;
 
 import za.ac.cput.domain.Cart;
+import za.ac.cput.domain.Order;
 import za.ac.cput.domain.Payment;
+import za.ac.cput.domain.enums.OrderStatus;
 import za.ac.cput.domain.enums.PaymentStatus;
 import za.ac.cput.factory.PaymentFactory;
 import org.junit.jupiter.api.MethodOrderer;
@@ -14,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -26,10 +29,17 @@ class PaymentControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    private static final String BASE_URL = "https://localhost:8080/payment";
+    private static final String BASE_URL = "https://localhost:8080/ADP_Capstone_Project/payment";
 
     public static void setup(){
-        payment = PaymentFactory.createPayment(LocalDate.of(2025, 8, 2), 400, PaymentStatus.PENDING);
+        Order order = new Order.Builder()
+                .setOrderID(1L)
+                .setOrderDate(LocalDateTime.now())
+                .setTotalAmount(400)
+                //.setPaymentStatus(OrderStatus.PENDING)
+                //.setUser(user) // assuming you have a User object
+                .build();
+        payment = PaymentFactory.createPayment(LocalDate.of(2025, 8, 2), 400, order, PaymentStatus.PENDING);
     }
 
     @Test

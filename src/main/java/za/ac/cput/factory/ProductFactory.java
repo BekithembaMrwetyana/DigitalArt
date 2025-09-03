@@ -47,6 +47,9 @@ public class ProductFactory {
                 .build();
     }
 
+<<<<<<< HEAD
+}
+=======
     public Product withBase64Image(Product product, String base64Image) {
         return new Product.Builder()
                 .copy(product)
@@ -54,3 +57,4 @@ public class ProductFactory {
                 .build();
     }
 }
+>>>>>>> f4960f5feb3b10bde06d7ae53c265dd2644e9506

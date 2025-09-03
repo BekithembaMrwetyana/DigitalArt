@@ -25,7 +25,7 @@ public class OrderFactory {
                 .setTotalAmount(totalAmount)
                 .setOrderDate(orderDate)
                 .setOrderAmount(orderAmount)
-                .setPaymentStatus(paymentStatus)
+                //.setPaymentStatus(paymentStatus)
                 .build();
     }
 }

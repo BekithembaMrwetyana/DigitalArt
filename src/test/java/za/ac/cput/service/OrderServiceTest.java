@@ -53,7 +53,7 @@ public class OrderServiceTest {
                 .setTotalAmount(200.00)
                 .setOrderAmount(150.00)
                 .setOrderDate(LocalDateTime.now())
-                .setPaymentStatus(OrderStatus.PENDING)
+                //.setPaymentStatus(OrderStatus.PENDING)
                 .build();
         testOrder.setUser(dummyUser);
 
@@ -79,7 +79,7 @@ public class OrderServiceTest {
     void c_testUpdate() {
         Order updated = new Order.Builder()
                 .copy(testOrder)
-                .setPaymentStatus(OrderStatus.SHIPPED)
+                //.setPaymentStatus(OrderStatus.SHIPPED)
                 .build();
         updated.setUser(dummyUser); // keep the user for JPA
 

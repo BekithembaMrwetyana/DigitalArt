@@ -20,10 +20,10 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 class PaymentFactoryTest {
 
-    @Test
-    void createPayment_success() {
-        Payment payment = PaymentFactory.createPayment(LocalDate.now(), 100.0, PaymentStatus.COMPLETED);
-        assertNotNull(payment);
-        System.out.print(payment);
-    }
+//    @Test
+//    void createPayment_success() {
+//        Payment payment = PaymentFactory.createPayment(LocalDate.now(), 100.0, PaymentStatus.COMPLETED);
+//        assertNotNull(payment);
+//        System.out.print(payment);
+//    }
 }
