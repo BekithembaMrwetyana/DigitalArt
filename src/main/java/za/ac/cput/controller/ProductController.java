@@ -11,18 +11,16 @@ import za.ac.cput.service.ProductService;
 import za.ac.cput.service.CategoryService;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
+@CrossOrigin (origins = "http://localhost:5173")
 @RequestMapping("/api/products")
-@CrossOrigin
+
 public class ProductController {
 
-    private final ProductService productService;
+
+private final ProductService productService;
     private final CategoryService categoryService;
 
     @Autowired
@@ -94,12 +92,15 @@ public class ProductController {
             @RequestParam(required = false) Double minPrice,
             @RequestParam(required = false) Double maxPrice
     ) {
+        List<Product> products;
         if (minPrice != null && maxPrice != null) {
-            return ResponseEntity.ok(productService.filterByPrice(minPrice, maxPrice));
+            products = productService.filterByPrice(minPrice, maxPrice);
         } else if (maxPrice != null) {
-            return ResponseEntity.ok(productService.filterByMaxPrice(maxPrice));
+            products = productService.filterByMaxPrice(maxPrice);
+        } else {
+            products = productService.getAll();
         }
-        return ResponseEntity.ok(productService.getAll());
+        return ResponseEntity.ok(products);
     }
 
     // -------------------- IMAGE UPLOAD --------------------
