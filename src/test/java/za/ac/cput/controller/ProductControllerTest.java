@@ -1,5 +1,6 @@
 package za.ac.cput.controller;
 
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,6 +25,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Transactional
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ProductControllerTest {
@@ -50,7 +52,7 @@ class ProductControllerTest {
                 .setTitle("Neon Dreams")
                 .setDescription("A stunning digital artwork exploring dreams and reality")
                 .setPrice(299.99)
-                .setImageUrl("/images/art1.jpeg")
+                .setImageUrl("/images/art7.jpeg")
                 .setCategory(category)
                 .build();
     }
@@ -140,7 +142,7 @@ class ProductControllerTest {
         assertNotNull(product, "Product must exist before uploading image");
 
         // Prepare the file to upload
-        Path path = Paths.get("src/main/resources/static/images/art1.jpeg");
+        Path path = Paths.get("src/main/resources/static/images/art7.jpeg");
         assertTrue(Files.exists(path), "Test image must exist at " + path.toAbsolutePath());
 
         // Wrap the file in a MultiValueMap for multipart request

@@ -60,6 +60,7 @@ public class ProductService implements IProductService {
         return encodeImages(productRepository.findAll());
     }
 
+
     @Override
     public List<Product> getByCategoryId(Long categoryId) {
         if (categoryId == null) return Collections.emptyList();

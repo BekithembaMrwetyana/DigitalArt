@@ -27,7 +27,7 @@ public class Product {
     private String imageUrl; // stores relative pathway for images
 
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE})
     @JoinColumn(name = "category_id", nullable = true)
     private Category category;
 

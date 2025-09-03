@@ -8,8 +8,9 @@ import jakarta.persistence.*;
  Date: 25 May 2025
 */
 @Entity
-@Table
+@Table(name = "order_items")
 public class OrderItem {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long itemID;
@@ -19,13 +20,12 @@ public class OrderItem {
     @ManyToOne
     private Product product;
 
-    
     private int quantity;
     private double unitPrice;
     private double subTotal;
-    
-    protected OrderItem(){
-        
+
+    protected OrderItem() {
+        // JPA requires protected no-args constructor
     }
 
     private OrderItem(Builder builder) {
@@ -93,7 +93,7 @@ public class OrderItem {
         }
 
         public Builder setProduct(Product product) {
-            this.product = this.product;
+            this.product = product; // FIXED: assign the passed product
             return this;
         }
 
@@ -128,15 +128,14 @@ public class OrderItem {
         }
 
         public OrderItem build() {
+            // Auto-calculate subtotal if not explicitly set
+            if (subTotal == 0 && unitPrice > 0 && quantity > 0) {
+                subTotal = unitPrice * quantity;
+            }
             return new OrderItem(this);
-
         }
     }
 }
-
-
-
-
 
 
 
