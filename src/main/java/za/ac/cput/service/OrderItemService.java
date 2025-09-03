@@ -24,8 +24,8 @@ public class OrderItemService implements IOrderItemService {
     }
 
     @Override
-    public OrderItem read(Long itemID) {
-        return repository.findById(itemID).orElse(null);
+    public OrderItem read(Long id) {
+        return repository.findById(id).orElse(null);
     }
 
     @Override
@@ -34,12 +34,29 @@ public class OrderItemService implements IOrderItemService {
     }
 
     @Override
-    public void delete(Long itemID) {
-        repository.deleteById(itemID);
+    public void delete(Long id) {
+        repository.deleteById(id);
     }
 
     @Override
     public List<OrderItem> getAll() {
         return repository.findAll();
     }
+
+    public List<OrderItem> getByOrderID(Long orderID) {
+        return repository.findByOrderID(orderID);
+    }
+
+    public List<OrderItem> getByProductID(Long productID) {
+        return repository.findByProductProductID(productID);
+    }
+
+    public List<OrderItem> filterByQuantityGreaterThan(int quantity) {
+        return repository.findByQuantityGreaterThan(quantity);
+    }
+
+    public List<OrderItem> filterBySubTotalBetween(double minAmount, double maxAmount) {
+        return repository.findBySubTotalBetween(minAmount, maxAmount);
+    }
 }
+

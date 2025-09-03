@@ -16,6 +16,7 @@ public class Category {
     private Long categoryId;
     private String name;
     private String description;
+    private String catergoryImage;
 
    protected Category() {
 
@@ -25,6 +26,7 @@ public class Category {
         this.categoryId = builder.categoryId;
         this.name = builder.name;
         this.description = builder.description;
+        this.catergoryImage = builder.categoryImage;
     }
 
     public Long getCategoryId() {
@@ -39,18 +41,25 @@ public class Category {
         return description;
     }
 
+    public String getCatergoryImage() {
+        return catergoryImage;
+    }
+
     @Override
     public String toString() {
         return "Category{" +
-                "categoryId='" + categoryId + '\'' +
+                "categoryId=" + categoryId +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
+                ", catergoryImage='" + catergoryImage + '\'' +
                 '}';
     }
+
     public static class Builder{
         private Long categoryId;
         private String name;
         private String description;
+        private String categoryImage;
 
         public Builder setCategoryId(Long categoryId) {
             this.categoryId = categoryId;
@@ -67,10 +76,16 @@ public class Category {
             return this;
         }
 
+        public Builder setCategoryImage(String categoryImage) {
+            this.categoryImage = categoryImage;
+            return this;
+        }
+
         public Builder copy(Category category) {
             this.categoryId = category.categoryId;
             this.name = category.name;
             this.description = category.description;
+            this.categoryImage = category.catergoryImage;
             return this;
         }
 

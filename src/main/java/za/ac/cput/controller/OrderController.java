@@ -1,4 +1,5 @@
 package za.ac.cput.controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import org.springframework.http.ResponseEntity;
 import za.ac.cput.domain.Order;
@@ -9,7 +10,10 @@ import za.ac.cput.service.OrderService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/orders")
+@CrossOrigin
+@RequestMapping("/api/orders")
+
+
 public class OrderController {
 
     private final OrderService service;
@@ -17,6 +21,7 @@ public class OrderController {
     @Autowired
     public OrderController(OrderService service) {
         this.service = service;
+        System.out.println("OrderController loaded ✅");
     }
 
     // Create
