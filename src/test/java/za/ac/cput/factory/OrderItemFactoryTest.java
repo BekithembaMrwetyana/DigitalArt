@@ -34,7 +34,6 @@ class OrderItemFactoryTest {
     @Test
     @Order(1)
     void a_createProduct() {
-<<<<<<< HEAD
         product = productFactory.create(
                 1L,
                 new Category.Builder()
@@ -46,9 +45,7 @@ class OrderItemFactoryTest {
                 "High resolution digital portrait",
                 150.0,"Image1"
         );
-=======
         product = productFactory.create(1L, category, "Portrait Art", "Digital portrait", 150.0, "portrait1.jpg");
->>>>>>> f4960f5feb3b10bde06d7ae53c265dd2644e9506
 
         assertNotNull(product);
         assertEquals("/images/portrait1.jpg", product.getImageUrl());

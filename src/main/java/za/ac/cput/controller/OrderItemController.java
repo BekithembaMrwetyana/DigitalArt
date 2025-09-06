@@ -8,12 +8,8 @@ import za.ac.cput.service.OrderItemService;
 import java.util.List;
 
 @RestController
-<<<<<<< HEAD
-@RequestMapping("/order_Items")
-=======
 @RequestMapping("/orderitems")
 @CrossOrigin(origins = "http://localhost:5173")
->>>>>>> f4960f5feb3b10bde06d7ae53c265dd2644e9506
 public class OrderItemController {
 
     private final OrderItemService service;
