@@ -90,12 +90,12 @@ class DiscountControllerTest {
     @Order(5)
     void getAll() {
         String url = BASE_URL + "/getAll";
-        ResponseEntity<Discount> response = this.restTemplate.getForEntity(url, Discount.class);
+        ResponseEntity<Discount[]> response = this.restTemplate.getForEntity(url, Discount[].class);
         assertNotNull(response.getBody());
         //assertTrue(response.getBody().length > 0);
         System.out.println("Get All: " + response.getBody());
-        //for (Discount discount : response.getBody()){
-        //    System.out.println(discount);
-        //}
+        for (Discount discount : response.getBody()){
+            System.out.println(discount);
+        }
     }
 }

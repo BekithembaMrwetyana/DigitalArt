@@ -25,7 +25,7 @@ class WishlistControllerTest {
     private TestRestTemplate restTemplate;
 
     private static Wishlist wishlist;
-    private final String BASE_URL = "http://localhost:8080/wishlist";
+    private final String BASE_URL = "/wishlist";
 
     @Test
     @Order(1)

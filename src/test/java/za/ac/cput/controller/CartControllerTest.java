@@ -25,7 +25,7 @@ class CartControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    private static final String BASE_URL = "http//:localhost:8080//ADP3_Capstone_Project/cart";
+    private static final String BASE_URL = "/cart";
 
     @BeforeAll
     public static void setup() {

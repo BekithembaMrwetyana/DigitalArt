@@ -53,7 +53,6 @@ public class Cart {
         return "Cart{" +
                 "cartID=" + cartID +
                 ", userID=" + user +
-                ", cartItem=" + cartItems +
                 '}';
     }
 

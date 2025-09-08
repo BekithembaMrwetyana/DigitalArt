@@ -1,5 +1,6 @@
 package za.ac.cput.controller;
 
+import org.junit.jupiter.api.BeforeAll;
 import za.ac.cput.domain.Cart;
 import za.ac.cput.domain.Order;
 import za.ac.cput.domain.Payment;
@@ -29,8 +30,9 @@ class PaymentControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    private static final String BASE_URL = "https://localhost:8080/ADP_Capstone_Project/payment";
+    private static final String BASE_URL = "/payment";
 
+    @BeforeAll
     public static void setup(){
         Order order = new Order.Builder()
                 .setOrderID(1L)
@@ -44,7 +46,7 @@ class PaymentControllerTest {
 
     @Test
     void create() {
-        String url = BASE_URL + "/read/" + payment.getPaymentID();
+        String url = BASE_URL + "/create";
         ResponseEntity<Payment> response = this.restTemplate.getForEntity(url, Payment.class);
         assertEquals(payment.getPaymentID(), response.getBody().getPaymentID());
         System.out.print("Read: " + response.getBody());
@@ -77,7 +79,7 @@ class PaymentControllerTest {
         String url = BASE_URL + "/delete/" + payment.getPaymentID();
         this.restTemplate.delete(url);
 
-        ResponseEntity<Cart> response = this.restTemplate.getForEntity(BASE_URL + "/read/" + payment.getPaymentID(), Cart.class);
+        ResponseEntity<Payment> response = this.restTemplate.getForEntity(BASE_URL + "/read/" + payment.getPaymentID(), Payment.class);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertNotNull(response.getBody());
         System.out.println("Deleted: " + payment.getPaymentID());
@@ -86,12 +88,12 @@ class PaymentControllerTest {
     @Test
     void getAll() {
         String url = BASE_URL + "/getAll";
-        ResponseEntity<Payment> response = this.restTemplate.getForEntity(url, Payment.class);
+        ResponseEntity<Payment[]> response = this.restTemplate.getForEntity(url, Payment[].class);
         assertNotNull(response.getBody());
         //assertTrue(response.getBody().length > 0);
-        System.out.println("Get All: " + response.getBody());
-        //for (Payment payment : response.getBody()){
-        //    System.out.println(payment);
-        //}
+        System.out.println("Get All: ");
+        for (Payment payment : response.getBody()){
+            System.out.println(payment);
+        }
     }
 }

@@ -16,13 +16,13 @@ import java.util.List;
 class ContactServiceTest {
 
     @Autowired
-    private static IContactService service;
+    private IContactService service;
 
     private static Contact contact;
 
     @BeforeAll
     static void setUp() {
-        contact = ContactFactory.createContact("0626737836", "", LocalDate.now(), "");
+        contact = ContactFactory.createContact("0626737836", "john@gmail.com", LocalDate.now(), "0863826574");
 
     }
 

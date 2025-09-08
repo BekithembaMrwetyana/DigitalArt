@@ -37,7 +37,7 @@ class CartItemControllerTest {
     @Autowired
     private CartItemService cartItemService;
 
-    private final String baseUrl = "http://localhost:8080/cart_item";
+    private final String baseUrl = "/cart_item";
 
     private User savedUser;
     private Cart savedCart;
@@ -93,7 +93,8 @@ class CartItemControllerTest {
                 .setPrice(49.99)
                 .build();
 
-        ResponseEntity<CartItem> response = restTemplate.postForEntity(
+        ResponseEntity<CartItem> response = restTemplate.
+                postForEntity(
                 baseUrl + "/create",
                 cartItem,
                 CartItem.class
