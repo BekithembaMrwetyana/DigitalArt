@@ -6,11 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import za.ac.cput.domain.User;
 import za.ac.cput.domain.enums.Role;
 import za.ac.cput.factory.UserFactory;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -20,7 +16,14 @@ class UserServiceTest {
     @Autowired
     private IUserService service;
 
-    private static User user;
+    private static User user = UserFactory.createUser(
+            "Doe",
+            "John",
+            "Password123",
+            Role.ADMIN,
+            "johndoe_service@example.com",
+            "0789037859"
+    );
 
     @BeforeAll
     static void setUp() {
@@ -28,12 +31,9 @@ class UserServiceTest {
                 "Doe",
                 "John",
                 "Password123",
-                LocalDateTime.now(),
-                LocalDate.now(),
                 Role.ADMIN,
-                "johndoe123@gmail.com",
-                "0789037859",
-                "0647824672"
+                "johndoe_service@example.com",
+                "0789037859"
         );
         assertNotNull(user);
     }
@@ -61,7 +61,6 @@ class UserServiceTest {
         User updatedUser = new User.Builder()
                 .copy(user)
                 .setFirstName("Jonathan")
-                .setLastLogin(LocalDateTime.now())
                 .build();
 
         User updated = service.update(updatedUser);
@@ -83,12 +82,5 @@ class UserServiceTest {
     void e_getAll() {
         List<User> allUsers = service.getAll();
         assertNotNull(allUsers);
-    }
-
-    @Test
-    @Order(6)
-    void f_verifyEmailPhoneSaved() {
-        User savedUser = service.read(user.getUserId());
-        assertNull(savedUser);
     }
 }

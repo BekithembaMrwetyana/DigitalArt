@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 import za.ac.cput.domain.User;
 import za.ac.cput.domain.enums.Role;
 import za.ac.cput.repository.UserRepository;
-
 import java.util.List;
 
 @Service
@@ -22,11 +21,9 @@ public class UserService implements IUserService {
         if (existingUser != null) {
             throw new IllegalArgumentException("Email is already in use: " + user.getEmail());
         }
-
         if (user.getRole() == null) {
             user.setRole(Role.CUSTOMER);
         }
-
         return repository.save(user);
     }
 
