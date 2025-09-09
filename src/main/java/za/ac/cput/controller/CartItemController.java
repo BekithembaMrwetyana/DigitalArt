@@ -49,4 +49,9 @@ public class CartItemController {
     public List<CartItem> getAll() {
         return service.getAll();
     }
+    @GetMapping("/findByUser/{userId}")
+    public List<CartItem> getCartItemsByUser(@PathVariable Long userId) {
+        return service.findByUserId(userId);
+    }
+
 }

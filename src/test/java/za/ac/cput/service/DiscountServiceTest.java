@@ -8,6 +8,7 @@ import za.ac.cput.factory.DiscountFactory;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,7 +24,7 @@ class DiscountServiceTest {
     @BeforeEach
     void setup() {
         discount = DiscountFactory.createDiscount(
-                "SUMMER25",
+                "SUMMER25" + UUID.randomUUID(),
                 new BigDecimal("25"),
                 LocalDate.of(2025, 8, 1),
                 LocalDate.of(2025, 8, 31)
@@ -49,7 +50,7 @@ class DiscountServiceTest {
     @Test
     @Order(3)
     void update() {
-        Discount newDiscount = new Discount.Builder().copy(discount).setDiscountId(123L).build();
+        Discount newDiscount = new Discount.Builder().copy(discount).setCode("Summer25" +UUID.randomUUID()).build();
         Discount updated = service.update(newDiscount);
         assertNotNull(updated);
         System.out.println(updated);

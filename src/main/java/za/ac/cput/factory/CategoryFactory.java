@@ -17,9 +17,9 @@ public class CategoryFactory {
 
         //String categoryId = Helper.generateId();
 
-       if(Helper.isNullOrEmpty(name) || Helper.isNullOrEmpty(description)) {
-           return null;
-       }
+        if(Helper.isNullOrEmpty(name) || Helper.isNullOrEmpty(description)) {
+            return null;
+        }
 
 
         return new Category.Builder()

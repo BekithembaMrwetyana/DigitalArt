@@ -1,33 +1,59 @@
 package za.ac.cput.factory;
 
-import za.ac.cput.domain.User;
 import org.junit.jupiter.api.Test;
-import za.ac.cput.factory.UserFactory;
+import za.ac.cput.domain.User;
+import za.ac.cput.domain.enums.Role;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-public class UserFactoryTest {
+import static org.junit.jupiter.api.Assertions.*;
 
-    private static User u1 = UserFactory.createUser("Nana", "Luvo", "Luv@2025", "luvo.nana@example.com", "0734567890", "0213456789");
-    private static User u2 = UserFactory.createUser("Precious", "Mbali", "Mbali@20002", "mbali.precious@example.com", "0821234567", "0112345678");
-    private static User u3 = UserFactory.createUser("Goodman", "Steers", "Steers@9120", "goodman.steers@example.com", "0719876543", "0412345678");
-
+class UserFactoryTest {
 
     @Test
-    public void testCreateUser() {
-        assertNotNull(u1);
-        System.out.println(u1.toString());
+    void createUserSuccess() {
+        User user = UserFactory.createUser(
+                "Doe",
+                "John",
+                "Password123",
+                Role.ADMIN,
+                "johndoe@example.com",
+                "0123456789"
+        );
+
+        assertNotNull(user);
+        assertEquals("John", user.getFirstName());
+        assertEquals("Doe", user.getLastName());
+        assertEquals("Password123", user.getPassword());
+        assertEquals(Role.ADMIN, user.getRole());
+        assertEquals("johndoe@example.com", user.getEmail());
+        assertEquals("0123456789", user.getPhoneNumber());
     }
 
     @Test
-    public void testCreateUserWithAllAttributes() {
-        assertNotNull(u2);
-        System.out.println(u2.toString());
+    void createUserFailsNullValues() {
+        User user = UserFactory.createUser(
+                null,
+                "",
+                null,
+                Role.CUSTOMER,
+                "",
+                ""
+        );
+        assertNull(user);
     }
 
     @Test
-    public void testCreateUserThatFails() {
-        assertNotNull(u3);
-        System.out.println(u1.toString());
+    void createUserFailsShortPhone() {
+        User user = UserFactory.createUser(
+                "Smith",
+                "Alice",
+                "pass123",
+                Role.CUSTOMER,
+                "alice@example.com",
+                "1234"
+        );
+        assertNull(user);
     }
 }

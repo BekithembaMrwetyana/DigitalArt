@@ -14,7 +14,7 @@ public class Wishlist {
     @JoinColumn(name = "userId", referencedColumnName = "userId")
     private User user;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany
     @JoinTable(
             name = "wishlist_products",
             joinColumns = @JoinColumn(name = "wishlistID"),

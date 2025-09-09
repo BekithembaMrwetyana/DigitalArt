@@ -39,4 +39,10 @@ public class PaymentController {
         return service.getAll();
     }
 
+//    @GetMapping("/user/{userId}")
+//    public List<Payment> getPaymentsByUser(@PathVariable Long userId) {
+//        return service.getPaymentsByUserId(userId);
+//    }
+
+
 }

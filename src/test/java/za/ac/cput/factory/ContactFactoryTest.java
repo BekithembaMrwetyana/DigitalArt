@@ -3,14 +3,16 @@ package za.ac.cput.factory;
 import org.junit.jupiter.api.Test;
 import za.ac.cput.domain.Contact;
 
+import java.time.LocalDate;
+
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class ContactFactoryTest {
 
-    private static Contact c1 = ContactFactory.createContact("0712345678", "james.carter@example.com", "0725075082");
-    private static Contact c2 = ContactFactory.createContact("0823456789", "sophia.miller@example.com", "0647924284");
-    private static Contact c3 = ContactFactory.createContact("0834567890", "invalid@example.com", "0761921751");// Should fail
+    private static Contact c1 = ContactFactory.createContact("0712345678", "james.carter@example.com", LocalDate.now(), "0725075082");
+    private static Contact c2 = ContactFactory.createContact("0823456789", "sophia.miller@example.com", LocalDate.now(),"0647924284");
+    private static Contact c3 = ContactFactory.createContact("", "invalid@example.com", LocalDate.now(), "0761921751");
 
     @Test
     public void testCreateContact() {

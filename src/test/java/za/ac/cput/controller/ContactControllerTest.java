@@ -9,6 +9,8 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.time.LocalDate;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static za.ac.cput.controller.UserControllerTest.*;
 
@@ -21,9 +23,7 @@ class ContactControllerTest {
     @BeforeAll
     public static void setup() {
         contact = ContactFactory.createContact(
-                "0662134256",
-                "ethan.hunt@example.com",
-                "0791234567"
+                "0662134256", "user@gmail.com", LocalDate.now(), "074937873"
         );
     }
 
@@ -66,8 +66,8 @@ class ContactControllerTest {
     @Test
     @Order(5)
     void e_getAllSimulation() {
-        Contact contact1 = ContactFactory.createContact("0711111111", "john.doe@example.com", "0722222222");
-        Contact contact2 = ContactFactory.createContact("0733333333", "jane.doe@example.com", "0744444444");
+        Contact contact1 = ContactFactory.createContact("0711111111", "john.doe@example.com", LocalDate.now(),"0722222222");
+        Contact contact2 = ContactFactory.createContact("0733333333", "jane.doe@example.com", LocalDate.now(), "0744444444");
 
         Contact[] allContacts = {contact1, contact2};
 

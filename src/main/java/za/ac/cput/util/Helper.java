@@ -93,11 +93,10 @@ public class Helper {
         return UUID.randomUUID().toString();
      }
 
-     public static boolean isNullOrEmpty(String str) {
-        if (str.isEmpty() || str == null)
-            return true;
-        return false;
-     }
+    public static boolean isNullOrEmpty(String str) {
+        return str == null || str.isEmpty();
+    }
+
     public static boolean isValidEntityId(String id) {
         return id != null && !id.trim().isEmpty() && id.length() <= 50;
     }
