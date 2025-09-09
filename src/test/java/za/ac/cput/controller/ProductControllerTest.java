@@ -8,10 +8,10 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
-import org.springframework.mock.web.MockMultipartFile;
+
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.multipart.MultipartFile;
+
 import za.ac.cput.domain.Category;
 import za.ac.cput.domain.Product;
 import za.ac.cput.service.CategoryService;
@@ -41,14 +41,14 @@ class ProductControllerTest {
 
     @BeforeAll
     void setup(@Autowired CategoryService categoryService) {
-        // Create category
+
         category = new Category.Builder()
                 .setName("Digital Art")
                 .setDescription("Digital artwork and illustrations")
                 .build();
         category = categoryService.create(category);
 
-        // Create product
+
         product = new Product.Builder()
                 .setTitle("Neon Dreams")
                 .setDescription("A stunning digital artwork exploring dreams and reality")
@@ -65,7 +65,7 @@ class ProductControllerTest {
         assertNotNull(response.getBody());
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(product.getTitle(), response.getBody().getTitle());
-        product = response.getBody(); // update ID
+        product = response.getBody();
         System.out.println("Created: " + product);
     }
 
@@ -139,14 +139,11 @@ class ProductControllerTest {
     @Test
     @Order(7)
     void g_uploadImage() throws IOException {
-        // Use the product already created in @BeforeAll
         assertNotNull(product, "Product must exist before uploading image");
 
-        // Prepare the file to upload
         Path path = Paths.get("src/main/resources/static/images/art7.jpeg");
         assertTrue(Files.exists(path), "Test image must exist at " + path.toAbsolutePath());
 
-        // Wrap the file in a MultiValueMap for multipart request
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         body.add("file", new FileSystemResource(path.toFile()));
 
@@ -155,34 +152,52 @@ class ProductControllerTest {
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-        // Call the upload-image endpoint
         ResponseEntity<Product> response = restTemplate.postForEntity(
                 BASE_URL + "/" + product.getProductID() + "/upload-image",
                 requestEntity,
                 Product.class
         );
 
-        // Assert that the response contains the updated product with image URL
-        assertNotNull(response.getBody(), "Response body should not be null");
-        assertNotNull(response.getBody().getImageUrl(), "Image URL should not be null");
-        assertTrue(response.getBody().getImageUrl().contains("/images/"), "Image URL should contain '/images/'");
-
-        System.out.println("Uploaded Image: " + response.getBody().getImageUrl());
+        Product updated = response.getBody();
 
 
+        assertNotNull(updated, "Response body should not be null");
+        assertNotNull(updated.getImageUrl(), "Image URL should not be null");
+        assertTrue(updated.getImageUrl().contains("/images/"), "Image URL should contain '/images/'");
 
-        // Update the product reference for future tests
-        product = response.getBody();
+
+        assertNotNull(updated.getImageData(), "Image data should be saved in the database");
+        assertTrue(updated.getImageData().length > 0, "Image bytes should not be empty");
+
+        System.out.println("Uploaded Image URL: " + updated.getImageUrl());
+        System.out.println("Image bytes length: " + updated.getImageData().length);
+
+
+        product = updated;
     }
+
 
     @Test
     @Order(8)
-    void h_delete() {
+    void h_getImage() {
+        ResponseEntity<byte[]> response = restTemplate.getForEntity(
+                BASE_URL + "/" + product.getProductID() + "/image",
+                byte[].class
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody(), "Image data should not be null");
+        assertTrue(response.getBody().length > 0, "Image data should not be empty");
+
+        System.out.println("Fetched image bytes, size: " + response.getBody().length);
+    }
+
+    @Test
+    @Order(9)
+    void i_delete() {
         restTemplate.delete(BASE_URL + "/" + product.getProductID());
         ResponseEntity<Product> response = restTemplate.getForEntity(BASE_URL + "/" + product.getProductID(), Product.class);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         System.out.println("Deleted product with ID: " + product.getProductID());
     }
-
-
 }

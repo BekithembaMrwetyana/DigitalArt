@@ -1,6 +1,7 @@
 package za.ac.cput.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,13 +15,11 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@CrossOrigin (origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/api/products")
-
 public class ProductController {
 
-
-private final ProductService productService;
+    private final ProductService productService;
     private final CategoryService categoryService;
 
     @Autowired
@@ -29,9 +28,7 @@ private final ProductService productService;
         this.categoryService = categoryService;
     }
 
-    // -------------------- CRUD --------------------
 
-    // CREATE
     @PostMapping
     public ResponseEntity<Product> create(@RequestBody Product product) {
         if (product.getCategory() != null && product.getCategory().getCategoryId() != null) {
@@ -42,20 +39,17 @@ private final ProductService productService;
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    // READ ALL
     @GetMapping
     public ResponseEntity<List<Product>> getAll() {
         return ResponseEntity.ok(productService.getAll());
     }
 
-    // READ BY ID
     @GetMapping("/{id}")
     public ResponseEntity<Product> getById(@PathVariable Long id) {
         Product product = productService.read(id);
         return (product == null) ? ResponseEntity.notFound().build() : ResponseEntity.ok(product);
     }
 
-    // UPDATE
     @PutMapping("/{id}")
     public ResponseEntity<Product> update(@PathVariable Long id, @RequestBody Product product) {
         product.setProductID(id);
@@ -63,16 +57,13 @@ private final ProductService productService;
         return (updated == null) ? ResponseEntity.notFound().build() : ResponseEntity.ok(updated);
     }
 
-    // DELETE
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         productService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
-    // -------------------- SEARCH & FILTER --------------------
 
-    // GET BY CATEGORY WITH FALLBACK
     @GetMapping("/category/{categoryId}")
     public ResponseEntity<List<Product>> getProductsByCategory(@PathVariable Long categoryId) {
         List<Product> products = productService.getByCategoryId(categoryId);
@@ -80,13 +71,13 @@ private final ProductService productService;
         return ResponseEntity.ok(products);
     }
 
-    // SEARCH BY TITLE
+
     @GetMapping("/search")
     public ResponseEntity<List<Product>> searchProducts(@RequestParam String keyword) {
         return ResponseEntity.ok(productService.searchByTitle(keyword));
     }
 
-    // FILTER BY PRICE
+
     @GetMapping("/filter/price")
     public ResponseEntity<List<Product>> filterByPrice(
             @RequestParam(required = false) Double minPrice,
@@ -103,7 +94,8 @@ private final ProductService productService;
         return ResponseEntity.ok(products);
     }
 
-    // -------------------- IMAGE UPLOAD --------------------
+
+
 
     @PostMapping("/{id}/upload-image")
     public ResponseEntity<Product> uploadImage(
@@ -115,4 +107,16 @@ private final ProductService productService;
         return ResponseEntity.ok(updated);
     }
 
+
+    @GetMapping("/{id}/image")
+    public ResponseEntity<byte[]> getImage(@PathVariable Long id) {
+        Product product = productService.read(id);
+        if (product == null || product.getImageData() == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, "image/jpeg")
+                .body(product.getImageData());
+    }
 }

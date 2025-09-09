@@ -30,10 +30,10 @@ class ProductServiceTest {
     @Autowired
     private ICategoryService categoryService;
 
-    // Categories
+
     private Category category1, category2, category3;
 
-    // Products
+
     private Product product1, product2, product3;
 
 
@@ -47,21 +47,21 @@ class ProductServiceTest {
                 .setCategory(category1)
                 .setTitle("3D Sculpture")
                 .setDescription("Digital 3D sculpture")
-                .setPrice(150.0)
+                .setPrice(159.99)
                 .setImageUrl("/images/art8.jpeg")
                 .build()
         );
 
         product2 = productService.create(new Product.Builder()
                 .setCategory(category2)
-                .setTitle("Abstract Art 1")
+                .setTitle("Abstract Art ")
                 .setDescription("Colorful abstract design")
-                .setPrice(200.0)
+                .setPrice(199.99)
                 .setImageUrl("/images/art9.jpeg")
                 .build()
         );
 
-        // ---- Batch 2 ----
+
         category3 = categoryService.create(new Category.Builder().setName("Landscape").setDescription("Landscape artworks").build());
 
 
@@ -69,7 +69,7 @@ class ProductServiceTest {
                 .setCategory(category3)
                 .setTitle("Ocean Waves")
                 .setDescription("Beautiful ocean landscape")
-                .setPrice(180.0)
+                .setPrice(179.99)
                 .setImageUrl("/images/art10.jpeg")
                 .build()
         );
@@ -105,24 +105,29 @@ class ProductServiceTest {
     @Test
     @Order(4)
     void testSaveImagesBatch() throws IOException {
-        // Example: save images for all 6 products
         Product[] products = {product1, product2, product3};
-        for (int i = 0; i < products.length; i++) {
-            Product p = products[i];
-            Path path = Paths.get("src/main/resources/static/images/art" + (i + 1) + ".jpeg");
-            assertTrue(Files.exists(path), "Test image must exist: " + path);
+        for (Product p : products) {
+            // Get filename from product's imageUrl
+            String fileName = Paths.get(p.getImageUrl()).getFileName().toString();
+
+            Path path = Paths.get("src/main/resources/static/images/" + fileName);
+            assertTrue(Files.exists(path), "Test image must exist: " + path.toAbsolutePath());
 
             MultipartFile file = new MockMultipartFile(
                     "file",
-                    "art" + (i + 1) + ".jpeg",
+                    fileName,
                     "image/jpeg",
                     Files.readAllBytes(path)
             );
 
             Product updated = productService.saveImage(p.getProductID(), file);
-            assertNotNull(updated.getImageUrl());
-            assertTrue(updated.getImageUrl().contains("art" + (i + 1) + ".jpeg"));
-            System.out.println("Saved image for product: " + updated.getTitle());
+
+            assertNotNull(updated.getImageData(), "Image data should be persisted in DB");
+            assertTrue(updated.getImageData().length > 0, "Image bytes should not be empty");
+            assertEquals(p.getImageUrl(), updated.getImageUrl(), "Image URL should remain correct");
+
+            System.out.println("Saved image for product: " + updated.getTitle() +
+                    ", bytes length: " + updated.getImageData().length);
         }
     }
 

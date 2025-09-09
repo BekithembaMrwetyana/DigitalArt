@@ -1,9 +1,6 @@
 package za.ac.cput.domain;
 
 import jakarta.persistence.*;
-
-import java.util.ArrayList;
-import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /*
@@ -14,8 +11,9 @@ Date: 25 May 2025
 */
 @Entity
 @Table(name = "products")
-@JsonIgnoreProperties({"orderItems", "wishlist","hibernateLazyInitializer"})
+@JsonIgnoreProperties({ "hibernateLazyInitializer" })
 public class Product {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "productId")
@@ -24,21 +22,22 @@ public class Product {
     private String title;
     private String description;
     private double price;
-    private String imageUrl; // stores relative pathway for images
 
+    private String imageUrl;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE})
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    private byte[] imageData;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE })
     @JoinColumn(name = "category_id", nullable = true)
     private Category category;
 
-    @ManyToMany(mappedBy = "products", fetch = FetchType.LAZY)
-    private List<Wishlist> wishlists = new ArrayList<>();
 
     @Transient
-    private String image;
+    private String imageBase64;
 
-    protected Product() {
-    }
+    protected Product() {}
 
     private Product(Builder builder) {
         this.productID = builder.productID;
@@ -47,58 +46,34 @@ public class Product {
         this.description = builder.description;
         this.price = builder.price;
         this.imageUrl = builder.imageUrl;
-        this.image = builder.image;
-    }
-    // Add these setter methods
-    public void setProductID(Long productID) {
-        this.productID = productID;
+        this.imageData = builder.imageData;
+        this.imageBase64 = builder.imageBase64;
     }
 
-    public void setCategory(Category category) {
-        this.category = category;
-    }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+    public Long getProductID() { return productID; }
+    public void setProductID(Long productID) { this.productID = productID; }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
 
-    public void setPrice(double price) {
-        this.price = price;
-    }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public void setImage(String image) { this.image = image; }
-
-    public Long getProductID() {
-        return productID;
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public double getPrice() {
-        return price;
-    }
+    public double getPrice() { return price; }
+    public void setPrice(double price) { this.price = price; }
 
     public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
-    public String getImage() { return image; }
+    public byte[] getImageData() { return imageData; }
+    public void setImageData(byte[] imageData) { this.imageData = imageData; }
+
+    public Category getCategory() { return category; }
+    public void setCategory(Category category) { this.category = category; }
+
+    public String getImageBase64() { return imageBase64; }
+    public void setImageBase64(String imageBase64) { this.imageBase64 = imageBase64; }
 
     @Override
     public String toString() {
@@ -109,9 +84,11 @@ public class Product {
                 ", description='" + description + '\'' +
                 ", price=" + price +
                 ", imageUrl='" + imageUrl + '\'' +
-                ", image='" + (image != null ? "[BASE64]" : null) + '\'' +
+                ", imageData=" + (imageData != null ? "[BINARY DATA]" : null) +
+                ", imageBase64=" + (imageBase64 != null ? "[BASE64]" : null) +
                 '}';
     }
+
 
     public static class Builder {
         private Long productID;
@@ -120,7 +97,8 @@ public class Product {
         private String description;
         private double price;
         private String imageUrl;
-        private String image;
+        private byte[] imageData;
+        private String imageBase64;
 
         public Builder setProductID(Long productID) {
             this.productID = productID;
@@ -146,13 +124,21 @@ public class Product {
             this.price = price;
             return this;
         }
+
         public Builder setImageUrl(String imageUrl) {
             this.imageUrl = imageUrl;
             return this;
         }
-        public Builder setImage(String image) {
-            this.image = image;
-            return this; }
+
+        public Builder setImageData(byte[] imageData) {
+            this.imageData = imageData;
+            return this;
+        }
+
+        public Builder setImageBase64(String imageBase64) {
+            this.imageBase64 = imageBase64;
+            return this;
+        }
 
         public Builder copy(Product product) {
             this.productID = product.productID;
@@ -161,7 +147,8 @@ public class Product {
             this.description = product.description;
             this.price = product.price;
             this.imageUrl = product.imageUrl;
-            this.image = product.image;
+            this.imageData = product.imageData;
+            this.imageBase64 = product.imageBase64;
             return this;
         }
 
@@ -170,4 +157,3 @@ public class Product {
         }
     }
 }
-

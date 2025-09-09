@@ -34,13 +34,13 @@ class ProductFactoryTest {
     @BeforeAll
     static void setUpCategories() {
         category1 = new Category.Builder()
-                .setCategoryId(1001L) // fake ID for testing, not persisted
+                .setCategoryId(1001L)
                 .setName("Portraits")
                 .setDescription("Portrait artworks")
                 .build();
 
         category2 = new Category.Builder()
-                .setCategoryId(1002L) // fake ID for testing, not persisted
+                .setCategoryId(1002L)
                 .setName("Abstract")
                 .setDescription("Abstract artworks")
                 .build();
@@ -69,5 +69,17 @@ class ProductFactoryTest {
 
         assertEquals(product1.getTitle(), copy1.getTitle());
         assertEquals(product2.getTitle(), copy2.getTitle());
+    }
+
+    @Test
+    @Order(3)
+    void c_updateProductImage() {
+        byte[] fakeImageData = {1, 2, 3, 4, 5};
+        Product updatedProduct = productFactory.updateImage(product1, "updated-art.jpeg", fakeImageData);
+
+        assertNotNull(updatedProduct);
+        assertEquals(product1.getProductID(), updatedProduct.getProductID());
+        assertEquals("/images/updated-art.jpeg", updatedProduct.getImageUrl());
+        assertArrayEquals(fakeImageData, updatedProduct.getImageData());
     }
 }

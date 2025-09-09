@@ -25,19 +25,18 @@ public class ProductFactory {
                 .build();
     }
 
-
     public Product copy(Product product) {
         return new Product.Builder()
                 .copy(product)
                 .build();
     }
 
+
+    public Product updateImage(Product product, String imageFileName, byte[] imageData) {
+        return new Product.Builder()
+                .copy(product)
+                .setImageUrl(imageFileName != null ? "/images/" + imageFileName : product.getImageUrl())
+                .setImageData(imageData != null ? imageData : product.getImageData())
+                .build();
+    }
 }
-
-//    public Product withBase64Image(Product product, String base64Image) {
-//        return new Product.Builder()
-//                .copy(product)
-//                .setImage(base64Image)
-//                .build();
-//    }
-

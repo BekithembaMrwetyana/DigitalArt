@@ -1,4 +1,5 @@
 package za.ac.cput.service;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,7 +13,6 @@ import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,20 +25,29 @@ public class ProductService implements IProductService {
         this.productRepository = productRepository;
     }
 
-    // Helper method to generate unique filename
-    private String generateUniqueFilename(MultipartFile file) {
-        return UUID.randomUUID() + "_" + file.getOriginalFilename();
-    }
 
     @Override
     public Product create(Product product) {
-        return productRepository.save(product);
+        try {
+            if (product.getImageUrl() != null && (product.getImageData() == null || product.getImageData().length == 0)) {
+                String fileName = Paths.get(product.getImageUrl()).getFileName().toString();
+                Path path = Paths.get("src/main/resources/static/images/" + fileName);
+                if (Files.exists(path)) {
+                    product.setImageData(Files.readAllBytes(path));
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load image for product: " + product.getTitle(), e);
+        }
+
+        return encodeImage(productRepository.save(product));
     }
 
     @Override
     public Product read(Long id) {
-        Product product = productRepository.findById(id).orElse(null);
-        return product != null ? encodeImage(product) : null;
+        return productRepository.findById(id)
+                .map(this::encodeImage)
+                .orElse(null);
     }
 
     @Override
@@ -46,8 +55,7 @@ public class ProductService implements IProductService {
         if (product.getProductID() == null || !productRepository.existsById(product.getProductID())) {
             return null;
         }
-        Product updated = productRepository.save(product);
-        return encodeImage(updated);
+        return encodeImage(productRepository.save(product));
     }
 
     @Override
@@ -59,7 +67,6 @@ public class ProductService implements IProductService {
     public List<Product> getAll() {
         return encodeImages(productRepository.findAll());
     }
-
 
     @Override
     public List<Product> getByCategoryId(Long categoryId) {
@@ -87,38 +94,31 @@ public class ProductService implements IProductService {
         return encodeImages(productRepository.findByPriceLessThanEqual(maxPrice));
     }
 
-    // ---------------- Image Upload ----------------
+
     @Override
+    @Transactional
     public Product saveImage(Long productId, MultipartFile file) throws IOException {
         Product product = productRepository.findById(productId).orElse(null);
         if (product == null) return null;
 
-        String filename = generateUniqueFilename(file);
+        byte[] bytes = file.getBytes();
+        if (bytes.length == 0) throw new IllegalArgumentException("File is empty");
 
-        // Absolute path to static/images folder
-        Path uploadDir = Paths.get("src/main/resources/static/images");
-        Files.createDirectories(uploadDir);
+        product.setImageData(bytes);
 
-        Path filePath = uploadDir.resolve(filename);
-        Files.write(filePath, file.getBytes());
 
-        // Set relative URL for the frontend
-        product.setImageUrl("/images/" + filename);
-        return encodeImage(update(product));
+        Product saved = productRepository.save(product);
+
+
+        return encodeImage(saved);
     }
 
-    // ---------------- Base64 Encoding ----------------
+
     private Product encodeImage(Product product) {
-        if (product.getImageUrl() != null) {
-            try {
-                Path path = Paths.get("src/main/resources/static/images", product.getImageUrl().replace("/images/", ""));
-                if (Files.exists(path)) {
-                    byte[] bytes = Files.readAllBytes(path);
-                    product.setImage(Base64.getEncoder().encodeToString(bytes));
-                }
-            } catch (IOException e) {
-                product.setImage(null);
-            }
+        if (product.getImageData() != null) {
+            product.setImageBase64(Base64.getEncoder().encodeToString(product.getImageData()));
+        } else {
+            product.setImageBase64(null);
         }
         return product;
     }
