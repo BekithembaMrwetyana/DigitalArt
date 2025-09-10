@@ -11,7 +11,7 @@ Date: 25 May 2025
 */
 @Entity
 @Table(name = "products")
-@JsonIgnoreProperties({ "hibernateLazyInitializer" })
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class Product {
 
     @Id

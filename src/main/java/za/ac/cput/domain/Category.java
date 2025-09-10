@@ -6,9 +6,11 @@ Author: Abethu Ngxitho 221297820
 Date: 07 May 2025
 */
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 @Entity
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Table(name = "category")
 public class Category {
    @Id
