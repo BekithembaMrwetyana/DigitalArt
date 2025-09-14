@@ -11,8 +11,6 @@ import za.ac.cput.domain.Wishlist;
 import za.ac.cput.domain.enums.Role;
 import za.ac.cput.factory.WishlistFactory;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,8 +29,6 @@ class WishlistServiceTest {
             .setLastName("Doe")
             .setPassword("password123")
             .setRole(Role.CUSTOMER)
-            .setCreateDate(LocalDate.now())
-            .setLastLogin(LocalDateTime.now())
             .build();
 
     static Product product = new Product.Builder()

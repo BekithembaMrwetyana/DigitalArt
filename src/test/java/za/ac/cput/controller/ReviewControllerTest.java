@@ -44,7 +44,7 @@ class ReviewControllerTest {
 
     @BeforeAll
     void init() {
-       
+
         savedUser = userService.create(
                 new User.Builder()
                         .setFirstName("Thando")

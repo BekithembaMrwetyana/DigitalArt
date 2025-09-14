@@ -1,15 +1,21 @@
 package za.ac.cput.controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import org.springframework.http.ResponseEntity;
 import za.ac.cput.domain.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.service.OrderService;
-
+import za.ac.cput.domain.enums.OrderStatus;
 import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/orders")
+@CrossOrigin
+@RequestMapping("/api/orders")
+
+
+
 public class OrderController {
 
     private final OrderService service;
@@ -17,6 +23,7 @@ public class OrderController {
     @Autowired
     public OrderController(OrderService service) {
         this.service = service;
+        System.out.println("OrderController loaded ");
     }
 
     // Create
@@ -34,18 +41,29 @@ public class OrderController {
     }
 
     // Update
-    @PutMapping("/update/{id}")
-    public ResponseEntity<Order> update(@PathVariable Long id, @RequestBody Order order) {
-        order.setId(id);
-        Order updated = service.update(order);
+    @PutMapping("/updateStatus/{id}")
+    public ResponseEntity<Order> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> updates) {
+        String statusStr = updates.get("paymentStatus");
+        OrderStatus status;
+
+        try {
+            status = OrderStatus.valueOf(statusStr.toUpperCase()); // convert string to enum
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null); // invalid status
+        }
+
+        Order updated = service.updateStatus(id, status);
         return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
     }
+
+
+
 
     // Delete
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
     // Get all

@@ -1,6 +1,9 @@
 package za.ac.cput.controller;
 
 import za.ac.cput.domain.OrderItem;
+import za.ac.cput.domain.Product;
+import za.ac.cput.domain.Category;
+import za.ac.cput.factory.ProductFactory;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,40 +16,70 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class OrderItemControllerTest {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class OrderItemControllerTest {
 
-    private static OrderItem orderItem;
+    private OrderItem orderItem;
+    private Product product;
+    private Category category;
 
     @Autowired
     private TestRestTemplate restTemplate;
 
-    private final String BASE_URL = "http://localhost:8080/orderitem";
+    @Autowired
+    private ProductFactory productFactory;
 
+    private final String BASE_URL = "/order_items";
+
+    @BeforeAll
+    void setup() {
+        category = new Category.Builder()
+                .setCategoryId(101L)
+                .setName("Digital Art")
+                .setDescription("All digital artworks")
+                .build();
+
+        product = productFactory.create(
+                1L,
+                category,
+                "Portrait Art",
+                "Digital portrait",
+                150.0,
+                "portrait1.jpg"
+        );
+    }
 
     @Test
     @Order(1)
-    void create() {
+    void a_create() {
         orderItem = new OrderItem.Builder()
-                .setItemID(1L)
                 .setOrderID(101L)
+                .setProduct(product)
                 .setQuantity(2)
-                .setUnitPrice(100.00)
+                .setUnitPrice(product.getPrice())
                 .calculateSubTotal()
                 .build();
+
         ResponseEntity<OrderItem> response = restTemplate.postForEntity(
-                BASE_URL + "/create", orderItem, OrderItem.class
+                BASE_URL + "/create",
+                orderItem,
+                OrderItem.class
         );
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals(orderItem.getItemID(), Objects.requireNonNull(response.getBody()).getItemID());
+        orderItem = response.getBody(); // update with DB-generated itemID
+        assertNotNull(orderItem.getItemID());
+        assertEquals(2, orderItem.getQuantity());
     }
 
     @Test
     @Order(2)
-    void read() {
-        String url = BASE_URL + "/get/" + orderItem.getItemID();
-        ResponseEntity<OrderItem> response = restTemplate.getForEntity(url, OrderItem.class);
+    void b_read() {
+        ResponseEntity<OrderItem> response = restTemplate.getForEntity(
+                BASE_URL + "/read/" + orderItem.getItemID(),
+                OrderItem.class
+        );
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -55,7 +88,7 @@ public class OrderItemControllerTest {
 
     @Test
     @Order(3)
-    void update() {
+    void c_update() {
         OrderItem updatedItem = new OrderItem.Builder()
                 .copy(orderItem)
                 .setQuantity(3)
@@ -63,8 +96,9 @@ public class OrderItemControllerTest {
                 .build();
 
         HttpEntity<OrderItem> entity = new HttpEntity<>(updatedItem);
+
         ResponseEntity<OrderItem> response = restTemplate.exchange(
-                BASE_URL + "/update/" + updatedItem.getItemID(),
+                BASE_URL + "/update",
                 HttpMethod.PUT,
                 entity,
                 OrderItem.class
@@ -72,31 +106,32 @@ public class OrderItemControllerTest {
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(3, Objects.requireNonNull(response.getBody()).getQuantity());
+        orderItem = response.getBody(); // update local reference
     }
 
     @Test
     @Order(4)
-    void delete() {
-        String url = BASE_URL + "/delete/" + orderItem.getItemID();
-        restTemplate.delete(url);
-
-        ResponseEntity<OrderItem> response = restTemplate.getForEntity(
-                BASE_URL + "/get/" + orderItem.getItemID(),
-                OrderItem.class
-        );
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-    }
-
-    @Test
-    @Order(5)
-    void getAll() {
+    void d_getAll() {
         ResponseEntity<OrderItem[]> response = restTemplate.getForEntity(
-                BASE_URL + "/getAll", OrderItem[].class
+                BASE_URL + "/getAll",
+                OrderItem[].class
         );
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
+        assertTrue(response.getBody().length > 0);
+    }
+
+    @Test
+    @Order(5)
+    void e_delete() {
+        restTemplate.delete(BASE_URL + "/delete/" + orderItem.getItemID());
+
+        ResponseEntity<OrderItem> response = restTemplate.getForEntity(
+                BASE_URL + "/read/" + orderItem.getItemID(),
+                OrderItem.class
+        );
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 }
-

@@ -41,6 +41,7 @@ public class Payment {
         this.paymentID = builder.paymentID;
         this.paymentDate = builder.paymentDate;
         this.amount = builder.amount;
+        this.order = builder.order;
     }
 
     public Long getPaymentID() {
@@ -53,6 +54,9 @@ public class Payment {
 
     public LocalDate getPaymentDate() {
         return paymentDate;
+    }
+    public Order getOrder() {
+        return order;
     }
 
     @Override
@@ -69,6 +73,7 @@ public class Payment {
         private Long paymentID;
         private LocalDate paymentDate;
         private double amount;
+        private Order order;
 
         public Builder setPaymentID(Long paymentID) {
             this.paymentID = paymentID;
@@ -84,11 +89,16 @@ public class Payment {
             this.amount = amount;
             return this;
         }
+        public Builder setOrder(Order order) {
+            this.order = order;
+            return this;
+        }
 
         public Builder copy(Payment payment){
             this.paymentID = payment.paymentID;
             this.paymentDate = payment.paymentDate;
             this.amount = payment.amount;
+            this.order = payment.order;
             return this;
         }
         public Payment build(){

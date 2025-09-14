@@ -93,7 +93,8 @@ class CartItemControllerTest {
                 .setPrice(49.99)
                 .build();
 
-        ResponseEntity<CartItem> response = restTemplate.postForEntity(
+        ResponseEntity<CartItem> response = restTemplate.
+                postForEntity(
                 baseUrl + "/create",
                 cartItem,
                 CartItem.class
@@ -152,3 +153,4 @@ class CartItemControllerTest {
 
     }
 }
+

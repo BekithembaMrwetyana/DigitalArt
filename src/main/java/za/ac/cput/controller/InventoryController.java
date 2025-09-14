@@ -30,10 +30,18 @@ public class InventoryController {
         return service.read(id);
     }
 
-    @PutMapping("/update")
-    public Inventory update(@RequestBody Inventory inventory) {
-        return service.update(inventory);
+    @PutMapping("/update/{id}")
+    public Inventory update(@PathVariable Long id, @RequestBody Inventory inventory) {
+
+        Inventory updatedInventory = new Inventory.Builder()
+                .copy(inventory)
+                .setInventoryID(id)
+                .build();
+
+        return service.update(updatedInventory);
     }
+
+
 
     @DeleteMapping("/delete/{id}")
     public void delete(@PathVariable Long id) {

@@ -9,6 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/orderitems")
+@CrossOrigin(origins = "http://localhost:5173")
 public class OrderItemController {
 
     private final OrderItemService service;
@@ -35,11 +36,31 @@ public class OrderItemController {
 
     @DeleteMapping("/delete/{id}")
     public void delete(@PathVariable Long id) {
-         service.delete(id);
+        service.delete(id);
     }
 
     @GetMapping("/getAll")
     public List<OrderItem> getAll() {
         return service.getAll();
+    }
+
+    @GetMapping("/order/{orderID}")
+    public List<OrderItem> getByOrderID(@PathVariable Long orderID) {
+        return service.getByOrderID(orderID);
+    }
+
+    @GetMapping("/product/{productID}")
+    public List<OrderItem> getByProductID(@PathVariable Long productID) {
+        return service.getByProductID(productID);
+    }
+
+    @GetMapping("/quantityAbove")
+    public List<OrderItem> filterByQuantityGreaterThan(@RequestParam int quantity) {
+        return service.filterByQuantityGreaterThan(quantity);
+    }
+
+    @GetMapping("/subTotalRange")
+    public List<OrderItem> filterBySubTotalBetween(@RequestParam double min, @RequestParam double max) {
+        return service.filterBySubTotalBetween(min, max);
     }
 }

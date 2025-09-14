@@ -10,6 +10,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import za.ac.cput.domain.ArtBrand;
 import za.ac.cput.factory.ArtBrandFactory;
 
+/*
+ArtbrandControllerTest
+ArtBrandControllerTest class
+Author: Thandolwethu Mseleku
+Date: 30 August 2025
+*/
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -26,17 +32,19 @@ class ArtBrandControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    private static final String BASE_URL = "/art_brands";
+    private static final String BASE_URL = "/api/art_brands";
 
     @BeforeAll
     void setup() {
-        artBrand = ArtBrandFactory.createArtBrand(
-                "Zeebrah",
-                "https://sl.bing.net/iQ2c6HPUr6W",
-                "zebras running",
-                LocalDate.now()
-        );
-    }
+            String imageUrl = "https://i.natgeofe.com/n/9a6e5e2e-5e7f-4308-a33e-64cf1978a649/42-18269780_square.jpg".trim();
+            artBrand = ArtBrandFactory.createArtBrand(
+                    "ZeebrahStudios",
+                    imageUrl,
+                    "zebras running",
+                    LocalDate.now()
+            );
+        }
+
 
     @Test
     @Order(1)
@@ -86,7 +94,7 @@ class ArtBrandControllerTest {
         assertEquals("Abstract Art", response.getBody().getBrandName());
         assertEquals("Updated description for Zeebrah", response.getBody().getDescription());
 
-        artBrand = response.getBody(); // update reference
+        artBrand = response.getBody();
         System.out.println("Updated: " + artBrand);
     }
 
@@ -110,5 +118,5 @@ class ArtBrandControllerTest {
     @Order(5)
     void e_delete() {
 
-        restTemplate.delete(BASE_URL + "/delete" + artBrand.getBrandId() );
+        restTemplate.delete(BASE_URL + "/delete/" + artBrand.getBrandId() );
 }}

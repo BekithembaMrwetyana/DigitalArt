@@ -1,103 +1,203 @@
 package za.ac.cput.controller;
+
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.*;
+
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+
 import za.ac.cput.domain.Category;
 import za.ac.cput.domain.Product;
-import za.ac.cput.factory.ProductFactory;
-import za.ac.cput.repository.CategoryRepository;
+import za.ac.cput.service.CategoryService;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@SpringBootTest
+import static org.junit.jupiter.api.Assertions.*;
+
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Transactional
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ProductControllerTest {
 
     @Autowired
-    private ProductController productController;
+    private TestRestTemplate restTemplate;
 
-    @Autowired
-    private ProductFactory productFactory;
+    private static Product product;
+    private static Category category;
 
-    @Autowired
-    private CategoryRepository categoryRepository;
-
-    private static Product product1;
-    private static Category testCategory;
+    private final String BASE_URL = "/api/products";
 
     @BeforeAll
-    static void setUp(@Autowired ProductController productController,
-                      @Autowired ProductFactory productFactory,
-                      @Autowired CategoryRepository categoryRepository) {
-        // Create and save a category using builder
-        testCategory = categoryRepository.save(
-                new Category.Builder()
-                        .setName("Art")
-                        .setDescription("Art-related items")
-                        .build()
-        );
+    void setup(@Autowired CategoryService categoryService) {
 
-        // Create product linked to category
-        product1 = productFactory.create(
-                1L,
-                testCategory,
-                "Portrait Art",
-                "Digital portrait of a person",
-                150.0
-        );
-        product1 = productController.create(product1);
-    }
-
-    @Test
-    void a_create() {
-        Product created = productController.create(product1);
-        assertNotNull(created);
-        assertEquals("Portrait Art", created.getTitle());
-        System.out.println("Controller created product: " + created);
-    }
-
-    @Test
-    void b_read() {
-        Product read = productController.read(product1.getProductID());
-        assertNotNull(read);
-        assertEquals(product1.getProductID(), read.getProductID());
-        System.out.println("Controller read product: " + read);
-    }
-
-    @Test
-    void c_update() {
-        Product updated = new Product.Builder()
-                .copy(product1)
-                .setPrice(175.0)
+        category = new Category.Builder()
+                .setName("Digital Art")
+                .setDescription("Digital artwork and illustrations")
                 .build();
-        Product result = productController.update(updated);
-        assertNotNull(result);
-        assertEquals(175.0, result.getPrice());
-        System.out.println("Controller updated product: " + result);
+        category = categoryService.create(category);
+
+
+        product = new Product.Builder()
+                .setTitle("Neon Dreams")
+                .setDescription("A stunning digital artwork exploring dreams and reality")
+                .setPrice(299.99)
+                .setImageUrl("/images/art7.jpeg")
+                .setCategory(category)
+                .build();
     }
 
     @Test
+    @Order(1)
+    void a_create() {
+        ResponseEntity<Product> response = restTemplate.postForEntity(BASE_URL, product, Product.class);
+        assertNotNull(response.getBody());
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(product.getTitle(), response.getBody().getTitle());
+        product = response.getBody();
+        System.out.println("Created: " + product);
+    }
+
+    @Test
+    @Order(2)
+    void b_read() {
+        ResponseEntity<Product> response = restTemplate.getForEntity(BASE_URL + "/" + product.getProductID(), Product.class);
+        assertNotNull(response.getBody());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(product.getProductID(), response.getBody().getProductID());
+        System.out.println("Read: " + response.getBody());
+    }
+
+    @Test
+    @Order(3)
+    void c_update() {
+        Product updatedProduct = new Product.Builder()
+                .copy(product)
+                .setTitle("Updated Neon Dreams")
+                .setPrice(349.99)
+                .build();
+
+        HttpEntity<Product> request = new HttpEntity<>(updatedProduct);
+        ResponseEntity<Product> response = restTemplate.exchange(BASE_URL + "/" + product.getProductID(), HttpMethod.PUT, request, Product.class);
+
+        assertNotNull(response.getBody());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Updated Neon Dreams", response.getBody().getTitle());
+        product = response.getBody();
+        System.out.println("Updated: " + response.getBody());
+    }
+
+    @Test
+    @Order(4)
     void d_getAll() {
-        List<Product> all = productController.getAll();
-        assertFalse(all.isEmpty());
-        System.out.println("Controller all products: " + all);
+        ResponseEntity<Product[]> response = restTemplate.getForEntity(BASE_URL, Product[].class);
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody().length > 0);
+        System.out.println("Get All:");
+        for (Product p : response.getBody()) System.out.println(p);
     }
 
     @Test
-    void e_getByCategory() {
-        List<Product> byCategory = productController.getByCategory(testCategory);
-        assertFalse(byCategory.isEmpty());
-        assertEquals(testCategory.getCategoryId(), byCategory.get(0).getCategory().getCategoryId());
-        System.out.println("Controller products by category " + testCategory.getCategoryId() + ": " + byCategory);
+    @Order(5)
+    void e_getProductsByCategory() {
+        ResponseEntity<List<Product>> response = restTemplate.exchange(
+                BASE_URL + "/category/" + category.getCategoryId(),
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<Product>>() {}
+        );
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody().size() > 0, "Products by category should not be empty");
+        System.out.println("Products by Category: " + response.getBody());
     }
 
     @Test
-    void f_searchByTitle() {
-        List<Product> found = productController.searchByTitle("Portrait");
-        assertFalse(found.isEmpty());
-        assertTrue(found.stream().anyMatch(p -> p.getTitle().contains("Portrait")));
-        System.out.println("Controller products found with 'Portrait': " + found);
+    @Order(6)
+    void f_searchProducts() {
+        ResponseEntity<List<Product>> response = restTemplate.exchange(
+                BASE_URL + "/search?keyword=Neon",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<Product>>() {}
+        );
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody().size() > 0, "Search results should not be empty");
+        System.out.println("Search Results: " + response.getBody());
+    }
+
+    @Test
+    @Order(7)
+    void g_uploadImage() throws IOException {
+        assertNotNull(product, "Product must exist before uploading image");
+
+        Path path = Paths.get("src/main/resources/static/images/art7.jpeg");
+        assertTrue(Files.exists(path), "Test image must exist at " + path.toAbsolutePath());
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", new FileSystemResource(path.toFile()));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+        ResponseEntity<Product> response = restTemplate.postForEntity(
+                BASE_URL + "/" + product.getProductID() + "/upload-image",
+                requestEntity,
+                Product.class
+        );
+
+        Product updated = response.getBody();
+
+
+        assertNotNull(updated, "Response body should not be null");
+        assertNotNull(updated.getImageUrl(), "Image URL should not be null");
+        assertTrue(updated.getImageUrl().contains("/images/"), "Image URL should contain '/images/'");
+
+
+        assertNotNull(updated.getImageData(), "Image data should be saved in the database");
+        assertTrue(updated.getImageData().length > 0, "Image bytes should not be empty");
+
+        System.out.println("Uploaded Image URL: " + updated.getImageUrl());
+        System.out.println("Image bytes length: " + updated.getImageData().length);
+
+
+        product = updated;
+    }
+
+
+    @Test
+    @Order(8)
+    void h_getImage() {
+        ResponseEntity<byte[]> response = restTemplate.getForEntity(
+                BASE_URL + "/" + product.getProductID() + "/image",
+                byte[].class
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody(), "Image data should not be null");
+        assertTrue(response.getBody().length > 0, "Image data should not be empty");
+
+        System.out.println("Fetched image bytes, size: " + response.getBody().length);
+    }
+
+    @Test
+    @Order(9)
+    void i_delete() {
+        restTemplate.delete(BASE_URL + "/" + product.getProductID());
+        ResponseEntity<Product> response = restTemplate.getForEntity(BASE_URL + "/" + product.getProductID(), Product.class);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        System.out.println("Deleted product with ID: " + product.getProductID());
     }
 }

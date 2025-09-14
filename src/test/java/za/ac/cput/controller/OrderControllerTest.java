@@ -26,7 +26,7 @@ public class OrderControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    private final String BASE_URL = "/orders";
+    private final String BASE_URL = "/api/orders";;
 
     @Test
     void testCreateOrder() {
@@ -35,7 +35,7 @@ public class OrderControllerTest {
                 .setTotalAmount(150.0)
                 .setOrderDate(LocalDateTime.now())
                 .setCartItem(Collections.emptyList())
-                .setPaymentStatus(OrderStatus.PENDING)
+                //.setPaymentStatus(OrderStatus.PENDING)
                 .build();
 
         ResponseEntity<Order> response = restTemplate.postForEntity(
@@ -55,7 +55,7 @@ public class OrderControllerTest {
                 .setTotalAmount(200.0)
                 .setOrderDate(LocalDateTime.now())
                 .setOrderAmount(150.0)
-                .setPaymentStatus(OrderStatus.PENDING)
+                //.setPaymentStatus(OrderStatus.PENDING)
                 .build();
 
         ResponseEntity<Order> createResponse = restTemplate.postForEntity(
@@ -83,7 +83,7 @@ public class OrderControllerTest {
                 .setTotalAmount(250.0)
                 .setOrderDate(LocalDateTime.now())
                 .setOrderAmount(200.0)
-                .setPaymentStatus(OrderStatus.PENDING)
+                //.setPaymentStatus(OrderStatus.PENDING)
                 .build();
 
         restTemplate.postForEntity(BASE_URL + "/create", order, Order.class);
@@ -91,7 +91,7 @@ public class OrderControllerTest {
 
         Order updatedOrder = new Order.Builder()
                 .copy(order)
-                .setPaymentStatus(OrderStatus.SHIPPED)
+                //.setPaymentStatus(OrderStatus.SHIPPED)
                 .build();
 
         HttpEntity<Order> request = new HttpEntity<>(updatedOrder);
@@ -116,7 +116,7 @@ public class OrderControllerTest {
                 .setTotalAmount(300.0)
                 .setOrderDate(LocalDateTime.now())
                 .setOrderAmount(200.0)
-                .setPaymentStatus(OrderStatus.PENDING)
+                //.setPaymentStatus(OrderStatus.PENDING)
                 .build();
 
         restTemplate.postForEntity(BASE_URL + "/create", order, Order.class);
@@ -125,7 +125,7 @@ public class OrderControllerTest {
                 BASE_URL + "/delete/" + order.getOrderID(),
                 HttpMethod.DELETE,
                 null,
-               Void.class
+                Void.class
         );
 
         assertEquals(HttpStatus.OK, deleteResponse.getStatusCode());;

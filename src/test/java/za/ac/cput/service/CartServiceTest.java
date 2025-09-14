@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class CartServiceTest {
 
     @Autowired
-    private static ICartService service;
+    private ICartService service;
 
     private static Cart cart;
 
@@ -26,8 +26,6 @@ class CartServiceTest {
     void setup() {
         User user = new User.Builder()
                 .setUserId(1L)
-                .setFirstName("Alex")
-                .setLastName("McConnor")
                 .build();
 
         List<CartItem> cartItems = new ArrayList<>();
@@ -60,10 +58,13 @@ class CartServiceTest {
     }
 
     @Test
+    @Order(4)
     void delete() {
+
     }
 
     @Test
+    @Order(5)
     void getAll() {
         System.out.println(service.getAll());
     }

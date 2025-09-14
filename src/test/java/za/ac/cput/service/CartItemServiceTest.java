@@ -50,8 +50,8 @@ class CartItemServiceTest {
                 .setFirstName("Thando")
                 .setLastName("Mseleku")
                 .setPassword("password123")
-                .setLastLogin(LocalDateTime.now())
-                .setCreateDate(LocalDate.of(2025,02,25))
+                //.setLastLogin(LocalDateTime.now())
+                //.setCreateDate(LocalDate.of(2025,02,25))
                 .build());
 
 
