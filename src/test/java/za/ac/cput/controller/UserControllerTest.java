@@ -10,20 +10,22 @@ import za.ac.cput.factory.UserFactory;
 import za.ac.cput.service.UserService;
 
 import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UserControllerTest {
 
     @Autowired
     private UserService service;
 
-    private static UserController controller;
-    private static User user;
+    private UserController controller;
+    private User user;
 
     @BeforeAll
-    static void setup(@Autowired UserService service) {
+    void setup() {
         controller = new UserController(service);
         user = UserFactory.createUser(
                 "Jon",
@@ -84,16 +86,18 @@ class UserControllerTest {
     @Test
     @Order(6)
     void f_login() {
+        String uniqueEmail = "alice" + System.currentTimeMillis() + "@example.com";
+
         User loginUser = controller.createUser(UserFactory.createUser(
                 "Alice",
                 "Smith",
                 "alice123",
                 Role.CUSTOMER,
-                "alice_controller@example.com",
+                uniqueEmail,
                 "0987654321"
         ));
 
-        LoginRequest loginRequest = new LoginRequest("alice_controller@example.com", "alice123");
+        LoginRequest loginRequest = new LoginRequest(uniqueEmail, "alice123");
         User loggedIn = controller.login(loginRequest);
         assertNotNull(loggedIn);
         assertEquals("Alice", loggedIn.getFirstName());

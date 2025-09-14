@@ -6,7 +6,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import za.ac.cput.domain.User;
 import za.ac.cput.domain.enums.Role;
 import za.ac.cput.factory.UserFactory;
+
 import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -21,7 +23,7 @@ class UserServiceTest {
             "John",
             "Password123",
             Role.ADMIN,
-            "johndoe_service@example.com",
+            "johndoe123@gmail.com",
             "0789037859"
     );
 
@@ -32,7 +34,7 @@ class UserServiceTest {
                 "John",
                 "Password123",
                 Role.ADMIN,
-                "johndoe_service@example.com",
+                "johndoe123@gmail.com",
                 "0789037859"
         );
         assertNotNull(user);
@@ -41,6 +43,17 @@ class UserServiceTest {
     @Test
     @Order(1)
     void a_create() {
+        String uniqueEmail = "johndoe" + System.currentTimeMillis() + "@example.com";
+
+        user = UserFactory.createUser(
+                "Doe",
+                "John",
+                "Password123",
+                Role.ADMIN,
+                uniqueEmail,
+                "0789037859"
+        );
+
         User created = service.create(user);
         assertNotNull(created);
         assertNotNull(created.getUserId());

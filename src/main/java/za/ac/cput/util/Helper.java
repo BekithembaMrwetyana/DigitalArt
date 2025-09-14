@@ -18,18 +18,19 @@ public class Helper {
     }
 
     public static boolean isValidProductID(int productID) {
-        return productID >0;
+        return productID > 0;
     }
 
     public static boolean isValidQuantity(int quantity) {
-        return quantity >0;
+        return quantity > 0;
     }
+
     public static boolean isValidOrderItemID(Long orderItemID) {
-        return orderItemID > 0; // Typically starts from 1
+        return orderItemID > 0;
     }
 
     public static boolean isValidOrderID(Long orderID) {
-        return orderID > 0; // Typically starts from 1
+        return orderID > 0;
     }
 
     public static boolean isValidUnitPrice(double unitPrice) {
@@ -48,7 +49,7 @@ public class Helper {
                 isValidQuantity(orderItem.getQuantity()) &&
                 isValidUnitPrice(orderItem.getUnitPrice()) &&
                 isValidSubTotal(orderItem.getSubTotal()) &&
-                Math.abs(orderItem.getSubTotal() - (orderItem.getUnitPrice() * orderItem.getQuantity())) < 0.001; // Verify calculation
+                Math.abs(orderItem.getSubTotal() - (orderItem.getUnitPrice() * orderItem.getQuantity())) < 0.001;
     }
 
     public static void validateOrderItem(OrderItem orderItem) {
@@ -56,6 +57,7 @@ public class Helper {
             throw new IllegalArgumentException("Invalid OrderItem: " + orderItem);
         }
     }
+
     public static boolean isValidProductID(String productID) {
         return productID != null && !productID.trim().isEmpty() && productID.matches("prod-\\d+");
     }
@@ -80,24 +82,22 @@ public class Helper {
         return categoryId != null && categoryId > 0;
     }
 
-
     public static boolean isValidProduct(Product product) {
         return product != null &&
-                //isValidProductID(product.getProductID()) &&
                 isValidTitle(product.getTitle()) &&
                 (product.getDescription() == null || isValidDescription(product.getDescription())) &&
                 isValidPrice(product.getPrice()) &&
                 (product.getCategory() == null || isValidCategoryID(product.getCategory().getCategoryId()));
     }
-     public static String generateId() {
-        return UUID.randomUUID().toString();
-     }
 
-     public static boolean isNullOrEmpty(String str) {
-        if (str.isEmpty() || str == null)
-            return true;
-        return false;
-     }
+    public static String generateId() {
+        return UUID.randomUUID().toString();
+    }
+
+    public static boolean isNullOrEmpty(String str) {
+        return str == null || str.trim().isEmpty();
+    }
+
     public static boolean isValidEntityId(String id) {
         return id != null && !id.trim().isEmpty() && id.length() <= 50;
     }
@@ -105,6 +105,7 @@ public class Helper {
     public static boolean isValidEntityId(int id) {
         return id > 0;
     }
+
     public static boolean isValidEntityId(Long id) {
         return id != null && id > 0;
     }
@@ -117,36 +118,42 @@ public class Helper {
         return order != null && isValidEntityId(order.getOrderID());
     }
 
-    // Payment validations
     public static boolean isValidPaymentID(String paymentID) {
         return paymentID != null && !paymentID.trim().isEmpty() && paymentID.matches("pay-\\d+");
     }
+
     public static boolean isValidPaymentDate(LocalDate paymentDate) {
         return paymentDate != null && !paymentDate.isAfter(LocalDate.now());
     }
+
     public static boolean isValidAmount(double amount) {
         return amount >= 0.0 && amount <= 999999.99;
     }
+
     public static boolean isValidStatus(String status) {
-        return status != null && !status.trim().isEmpty() && (status.equalsIgnoreCase("Pending") || status.equalsIgnoreCase("Completed") || status.equalsIgnoreCase("Failed"));
+        return status != null && !status.trim().isEmpty() &&
+                (status.equalsIgnoreCase("Pending") ||
+                        status.equalsIgnoreCase("Completed") ||
+                        status.equalsIgnoreCase("Failed"));
     }
+
     public static boolean isValidMethod(String method) {
-        return method != null && !method.trim().isEmpty() && (method.equalsIgnoreCase("Credit Card") || method.equalsIgnoreCase("Debit Card"));
+        return method != null && !method.trim().isEmpty() &&
+                (method.equalsIgnoreCase("Credit Card") ||
+                        method.equalsIgnoreCase("Debit Card"));
     }
+
     public static boolean isValidPayment(Payment payment) {
         return payment != null &&
                 isValidPaymentDate(payment.getPaymentDate()) &&
                 isValidAmount(payment.getAmount());
     }
 
-    // Cart validations
-
     public static boolean isValidCartID(String cartID) {
         return cartID != null && !cartID.trim().isEmpty() && cartID.matches("cart-\\d+");
     }
+
     public static boolean isValidUser(int userID) {
         return userID > 0;
     }
-
-
 }

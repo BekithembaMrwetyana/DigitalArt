@@ -1,10 +1,14 @@
 package za.ac.cput.controller;
 
+import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.User;
 import za.ac.cput.dto.LoginRequest;
 import za.ac.cput.service.UserService;
+
 import java.util.List;
 
+@RestController
+@RequestMapping("/users")
 public class UserController {
 
     private final UserService service;
@@ -13,28 +17,34 @@ public class UserController {
         this.service = service;
     }
 
-    public User createUser(User user) {
+    @PostMapping("/create")
+    public User createUser(@RequestBody User user) {
         return service.create(user);
     }
 
-    public User getUserById(Long id) {
+    @GetMapping("/read/{id}")
+    public User getUserById(@PathVariable Long id) {
         return service.read(id);
     }
 
-    public User updateUser(Long id, User user) {
+    @PutMapping("/update/{id}")
+    public User updateUser(@PathVariable Long id, @RequestBody User user) {
         user.setUserId(id);
         return service.update(user);
     }
 
-    public void deleteUser(Long id) {
+    @DeleteMapping("/delete/{id}")
+    public void deleteUser(@PathVariable Long id) {
         service.delete(id);
     }
 
+    @GetMapping("/getAll")
     public List<User> getAll() {
         return service.getAll();
     }
 
-    public User login(LoginRequest loginRequest) {
+    @PostMapping("/login")
+    public User login(@RequestBody LoginRequest loginRequest) {
         User user = service.getByEmail(loginRequest.getEmail());
         if (user != null && user.getPassword().equals(loginRequest.getPassword())) {
             return user;
