@@ -1,8 +1,10 @@
 package za.ac.cput.controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.User;
 import za.ac.cput.dto.LoginRequest;
+import za.ac.cput.dto.UserResponse;
 import za.ac.cput.service.UserService;
 
 import java.util.List;
@@ -33,6 +35,12 @@ public class UserController {
         return service.update(user);
     }
 
+    @PatchMapping("/update/{id}")
+    public User partialUpdateUser(@PathVariable Long id, @RequestBody User user) {
+        user.setUserId(id);
+        return service.partialUpdate(user);
+    }
+
     @DeleteMapping("/delete/{id}")
     public void deleteUser(@PathVariable Long id) {
         service.delete(id);
@@ -44,11 +52,30 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public User login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<UserResponse> login(@RequestBody LoginRequest loginRequest) {
         User user = service.getByEmail(loginRequest.getEmail());
-        if (user != null && user.getPassword().equals(loginRequest.getPassword())) {
-            return user;
+
+        if (user == null) {
+            return ResponseEntity.status(404).build();
         }
-        return null;
+
+        if (!user.getPassword().equals(loginRequest.getPassword())) {
+            return ResponseEntity.status(401).build();
+        }
+
+        if (!user.getRole().name().equalsIgnoreCase(loginRequest.getRole())) {
+            return ResponseEntity.status(403).build();
+        }
+
+        UserResponse response = new UserResponse(
+                user.getUserId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getPhoneNumber(),
+                user.getRole()
+        );
+
+        return ResponseEntity.ok(response);
     }
 }

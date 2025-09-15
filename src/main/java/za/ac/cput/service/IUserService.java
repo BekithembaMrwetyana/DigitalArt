@@ -5,6 +5,5 @@ import java.util.List;
 
 public interface IUserService extends IService<User, Long> {
     List<User> getAll();
+    User partialUpdate(User user);
 }
-
-

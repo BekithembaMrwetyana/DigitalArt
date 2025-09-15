@@ -37,6 +37,20 @@ public class UserService implements IUserService {
         return repository.save(user);
     }
 
+    public User partialUpdate(User user) {
+        User existing = read(user.getUserId());
+        if (existing == null) return null;
+
+        if (user.getFirstName() != null) existing.setFirstName(user.getFirstName());
+        if (user.getLastName() != null) existing.setLastName(user.getLastName());
+        if (user.getEmail() != null) existing.setEmail(user.getEmail());
+        if (user.getPhoneNumber() != null) existing.setPhoneNumber(user.getPhoneNumber());
+        if (user.getPassword() != null) existing.setPassword(user.getPassword());
+        if (user.getRole() != null) existing.setRole(user.getRole());
+
+        return repository.save(existing);
+    }
+
     @Override
     public void delete(Long id) {
         repository.deleteById(id);

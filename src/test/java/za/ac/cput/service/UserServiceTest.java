@@ -84,15 +84,29 @@ class UserServiceTest {
 
     @Test
     @Order(4)
-    void d_delete() {
+    void d_partialUpdate() {
+        User patchUser = new User.Builder()
+                .copy(user)
+                .setLastName("Smith")
+                .build();
+
+        User patched = service.partialUpdate(patchUser);
+        assertNotNull(patched);
+        assertEquals("Smith", patched.getLastName());
+        user = patched;
+    }
+
+    @Test
+    @Order(5)
+    void e_delete() {
         service.delete(user.getUserId());
         User deletedUser = service.read(user.getUserId());
         assertNull(deletedUser);
     }
 
     @Test
-    @Order(5)
-    void e_getAll() {
+    @Order(6)
+    void f_getAll() {
         List<User> allUsers = service.getAll();
         assertNotNull(allUsers);
     }
