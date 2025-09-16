@@ -3,6 +3,7 @@ package za.ac.cput.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.CartItem;
+import za.ac.cput.dto.CartItemDTO;
 import za.ac.cput.service.CartItemService;
 /*
 CartItemController.java
@@ -15,6 +16,7 @@ Date: 03 August 2025
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/cart_item")
 public class CartItemController {
 
@@ -49,9 +51,19 @@ public class CartItemController {
     public List<CartItem> getAll() {
         return service.getAll();
     }
+
     @GetMapping("/findByUser/{userId}")
-    public List<CartItem> getCartItemsByUser(@PathVariable Long userId) {
-        return service.findByUserId(userId);
+    public List<CartItemDTO> getCartItemsByUser(@PathVariable Long userId) {
+        List<CartItem> items = service.findByUserId(userId);
+
+        return items.stream().map(item -> new CartItemDTO(
+                item.getCartItemID(),
+                item.getProduct() != null ? item.getProduct().getProductID() : null,
+                item.getProduct() != null ? item.getProduct().getTitle() : "Unnamed Product",
+                item.getQuantity(),
+                item.getPrice(),
+                item.getUser() != null ? item.getUser().getUserId() : null
+        )).toList();
     }
 
 }

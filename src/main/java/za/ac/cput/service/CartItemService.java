@@ -1,3 +1,4 @@
+
 package za.ac.cput.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,27 +35,17 @@ public class CartItemService implements ICartItemService {
 
     @Override
     public CartItem create(CartItem cartItem) {
-
-        User user = cartItem.getUser();
-        if (user != null && user.getUserId() == null) {
-            user = userRepository.save(user);
+        Long userId = cartItem.getUser() != null ? cartItem.getUser().getUserId() : null;
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID is required");
         }
-
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         Product product = cartItem.getProduct();
-        if (product != null) {
-            Category category = product.getCategory();
-            if (category != null && category.getCategoryId() == null) {
-                category = categoryRepository.save(category);
-                product = new Product.Builder()
-                        .copy(product)
-                        .setCategory(category)
-                        .build();
-            }
-
-            if (product.getProductID() == null) {
-                product = productRepository.save(product);
-            }
+        if (product != null && product.getProductID() != null) {
+            product = productRepository.findById(product.getProductID())
+                    .orElseThrow(() -> new IllegalArgumentException("Product not found"));
         }
 
         CartItem savedCartItem = new CartItem.Builder()
@@ -67,6 +58,7 @@ public class CartItemService implements ICartItemService {
 
         return cartItemRepository.save(savedCartItem);
     }
+
 
     @Override
     public CartItem read(Long cartItemId) {
