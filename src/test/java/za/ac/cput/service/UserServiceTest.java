@@ -44,11 +44,12 @@ class UserServiceTest {
     @Order(1)
     void a_create() {
         String uniqueEmail = "johndoe" + System.currentTimeMillis() + "@example.com";
+        String uniquePassword = "Password" + System.currentTimeMillis();
 
         user = UserFactory.createUser(
                 "Doe",
                 "John",
-                "Password123",
+                uniquePassword,
                 Role.ADMIN,
                 uniqueEmail,
                 "0789037859"
@@ -109,5 +110,20 @@ class UserServiceTest {
     void f_getAll() {
         List<User> allUsers = service.getAll();
         assertNotNull(allUsers);
+    }
+
+    @Test
+    @Order(7)
+    void g_createDuplicatePassword() {
+        String uniqueEmail = "janedoe" + System.currentTimeMillis() + "@example.com";
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> service.create(UserFactory.createUser(
+                "Jane",
+                "Doe",
+                user.getPassword(),
+                Role.CUSTOMER,
+                uniqueEmail,
+                "0790000000"
+        )));
+        assertEquals("Password is already in use", exception.getMessage());
     }
 }
