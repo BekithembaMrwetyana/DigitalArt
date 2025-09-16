@@ -45,7 +45,9 @@ class UserControllerTest {
     @Test
     @Order(1)
     void a_create() {
-        User created = controller.createUser(user);
+        ResponseEntity<?> response = controller.createUser(user);
+        assertEquals(200, response.getStatusCodeValue());
+        User created = (User) response.getBody();
         assertNotNull(created);
         assertNotNull(created.getUserId());
         user = created;
@@ -107,7 +109,7 @@ class UserControllerTest {
     void g_login() {
         String uniqueEmail = "alice" + System.currentTimeMillis() + "@example.com";
 
-        User loginUser = controller.createUser(UserFactory.createUser(
+        controller.createUser(UserFactory.createUser(
                 "Alice",
                 "Smith",
                 "alice123",

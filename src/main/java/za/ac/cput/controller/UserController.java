@@ -20,8 +20,13 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    public User createUser(@RequestBody User user) {
-        return service.create(user);
+    public ResponseEntity<?> createUser(@RequestBody User user) {
+        try {
+            User created = service.create(user);
+            return ResponseEntity.ok(created);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        }
     }
 
     @GetMapping("/read/{id}")

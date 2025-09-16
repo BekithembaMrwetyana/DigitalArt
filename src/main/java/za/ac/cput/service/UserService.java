@@ -17,9 +17,17 @@ public class UserService implements IUserService {
 
     @Override
     public User create(User user) {
-        User existingUser = getByEmail(user.getEmail());
-        if (existingUser != null) {
-            throw new IllegalArgumentException("Email is already in use: " + user.getEmail());
+        if (getByEmail(user.getEmail()) != null) {
+            throw new IllegalArgumentException("Email already in use");
+        }
+        if (repository.existsByPassword(user.getPassword())) {
+            throw new IllegalArgumentException("Password already in use");
+        }
+        if (!user.getPhoneNumber().matches("\\d{10,11}")) {
+            throw new IllegalArgumentException("Phone number must be 10-11 digits");
+        }
+        if (repository.existsByPhoneNumber(user.getPhoneNumber())) {
+            throw new IllegalArgumentException("Phone number already in use");
         }
         if (user.getRole() == null) {
             user.setRole(Role.CUSTOMER);
