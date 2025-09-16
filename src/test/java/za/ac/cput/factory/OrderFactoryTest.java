@@ -49,7 +49,7 @@ class OrderFactoryTest {
                 + (item2.getProduct().getPrice() * item2.getQuantity());
 
         LocalDateTime orderDate = LocalDateTime.now();
-        OrderStatus paymentStatus = OrderStatus.SHIPPED;
+        OrderStatus paymentStatus = OrderStatus.COMPLETED;
 
         Order order = OrderFactory.createOrder(
                 orderID,

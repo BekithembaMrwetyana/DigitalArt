@@ -2,7 +2,7 @@ package za.ac.cput.domain.enums;
 
 public enum OrderStatus {
     PENDING,
-    SHIPPED,
+    COMPLETED,
     CANCELLED,
-    RETURNED
+
 }

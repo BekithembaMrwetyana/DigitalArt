@@ -8,7 +8,9 @@ import za.ac.cput.service.CartService;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/cart")
+
 public class CartController {
     private CartService service;
 

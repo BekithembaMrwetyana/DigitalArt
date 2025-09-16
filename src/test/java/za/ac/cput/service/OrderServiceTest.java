@@ -79,12 +79,12 @@ public class OrderServiceTest {
     void c_testUpdate() {
         Order updated = new Order.Builder()
                 .copy(testOrder)
-                //.setPaymentStatus(OrderStatus.SHIPPED)
+                //.setPaymentStatus(OrderStatus.COMPLETED)
                 .build();
         updated.setUser(dummyUser); // keep the user for JPA
 
         Order result = service.update(updated);
-        assertEquals(OrderStatus.SHIPPED, result.getPaymentStatus());
+        assertEquals(OrderStatus.COMPLETED, result.getPaymentStatus());
         System.out.println("Updated order: " + result);
     }
 

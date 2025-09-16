@@ -18,4 +18,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByPaymentStatus(OrderStatus paymentStatus);
 
     List<Order> findByTotalAmountGreaterThan(double amount);
+    List<Order> findByUserUserIdAndPaymentStatus(Long userId, OrderStatus status);
+
 }
