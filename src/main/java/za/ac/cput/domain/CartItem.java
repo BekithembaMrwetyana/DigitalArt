@@ -21,7 +21,7 @@ public class CartItem {
     @JoinColumn(name = "cartID")
     private Cart cart;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Product product;

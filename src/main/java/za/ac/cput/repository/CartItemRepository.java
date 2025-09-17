@@ -5,6 +5,7 @@ CartItemRepository POJO class
 Author: Thandolwethu P Mseleku
 Date: 25/05/2025
 */
+import org.springframework.data.repository.query.Param;
 import za.ac.cput.domain.Cart;
 import za.ac.cput.domain.CartItem;
 import za.ac.cput.domain.Product;
@@ -17,6 +18,8 @@ import java.util.List;
 public interface CartItemRepository extends JpaRepository<CartItem, Long> {
 
     List<CartItem> findByUser_UserId(Long userId);
+    //List<CartItem> findByUserIdWithProducts(@Param("userId") Long userId);
+
 
     List<CartItem> findByCart(Cart cart);
 
