@@ -47,9 +47,6 @@ public class OrderService implements IOrderService {
         return repository.save(order);
     }
 
-
-
-
     @Override
     public void delete(Long orderID) {
         repository.deleteById(orderID);
@@ -64,7 +61,15 @@ public class OrderService implements IOrderService {
     public List<Order> getAll() {
         return repository.findAll();
     }
+
+    // Get all orders for a specific user
     public List<Order> getOrdersByUserId(Long userId) {
         return repository.findByUserUserId(userId);
     }
+
+    // Get orders for a user filtered by status
+    public List<Order> getOrdersByUserIdAndStatus(Long userId, OrderStatus status) {
+        return repository.findByUserUserIdAndPaymentStatus(userId, status);
+    }
 }
+

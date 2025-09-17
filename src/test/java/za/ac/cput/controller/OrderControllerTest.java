@@ -91,7 +91,7 @@ public class OrderControllerTest {
 
         Order updatedOrder = new Order.Builder()
                 .copy(order)
-                //.setPaymentStatus(OrderStatus.SHIPPED)
+                //.setPaymentStatus(OrderStatus.COMPLETED)
                 .build();
 
         HttpEntity<Order> request = new HttpEntity<>(updatedOrder);
@@ -104,7 +104,7 @@ public class OrderControllerTest {
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals(OrderStatus.SHIPPED , response.getBody().getPaymentStatus());
+        assertEquals(OrderStatus.COMPLETED, response.getBody().getPaymentStatus());
     }
 
     @Test

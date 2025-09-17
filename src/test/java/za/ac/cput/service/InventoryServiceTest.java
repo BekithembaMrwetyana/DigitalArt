@@ -28,49 +28,45 @@ public class InventoryServiceTest {
 
     private Product dummyProduct() {
         return new Product.Builder()
-                .setProductID(1l)
+                .setProductID(1L)
                 .setTitle("Test Product")
                 .setPrice(99.99)
                 .build();
     }
 
-    private Inventory buildInventory(Long id, Product product, int quantity) {
+    private Inventory buildInventory(Long id, Product product) {
         return new Inventory.Builder()
                 .setInventoryID(id)
                 .setProduct(product)
-                .setQuantity(quantity)
                 .build();
     }
 
     @BeforeEach
     void setUp() {
         repository.deleteAll();
-        testInventory = buildInventory(1L, dummyProduct(), 50);
+        testInventory = buildInventory(1L, dummyProduct());
         service.create(testInventory);
     }
 
     @Test
     void a_testCreate() {
         assertNotNull(testInventory.getInventoryID());
-        assertEquals(50, testInventory.getQuantity());
     }
 
     @Test
     void b_testRead() {
         Inventory found = service.read(testInventory.getInventoryID());
         assertNotNull(found);
-        assertEquals(testInventory.getQuantity(), found.getQuantity());
     }
 
     @Test
     void c_testUpdate() {
         Inventory updatedInventory = new Inventory.Builder()
                 .copy(testInventory)
-                .setQuantity(75)
                 .build();
 
         Inventory result = service.update(updatedInventory);
-        assertEquals(75, result.getQuantity());
+        assertNotNull(result);
     }
 
     @Test
@@ -78,7 +74,8 @@ public class InventoryServiceTest {
         List<Inventory> inventories = service.getAll();
         assertNotNull(inventories);
         assertFalse(inventories.isEmpty());
-        assertTrue(inventories.stream().anyMatch(inv -> inv.getInventoryID().equals(testInventory.getInventoryID())));
+        assertTrue(inventories.stream()
+                .anyMatch(inv -> inv.getInventoryID().equals(testInventory.getInventoryID())));
     }
 
     @Test

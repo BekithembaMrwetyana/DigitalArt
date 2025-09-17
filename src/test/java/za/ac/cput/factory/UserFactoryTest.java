@@ -4,9 +4,6 @@ import org.junit.jupiter.api.Test;
 import za.ac.cput.domain.User;
 import za.ac.cput.domain.enums.Role;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserFactoryTest {
@@ -14,8 +11,8 @@ class UserFactoryTest {
     @Test
     void createUserSuccess() {
         User user = UserFactory.createUser(
-                "Doe",
                 "John",
+                "Doe",
                 "Password123",
                 Role.ADMIN,
                 "johndoe@example.com",
@@ -47,8 +44,8 @@ class UserFactoryTest {
     @Test
     void createUserFailsShortPhone() {
         User user = UserFactory.createUser(
-                "Smith",
                 "Alice",
+                "Smith",
                 "pass123",
                 Role.CUSTOMER,
                 "alice@example.com",

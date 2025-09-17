@@ -1,56 +1,64 @@
 package za.ac.cput.controller;
 
-import za.ac.cput.domain.User;
-import za.ac.cput.domain.enums.Role;
-import za.ac.cput.factory.UserFactory;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import za.ac.cput.domain.User;
+import za.ac.cput.domain.enums.Role;
+import za.ac.cput.dto.LoginRequest;
+import za.ac.cput.dto.UserResponse;
+import za.ac.cput.factory.UserFactory;
+import za.ac.cput.service.UserService;
 
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestMethodOrder(MethodOrderer.MethodName.class)
+@SpringBootTest
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class UserControllerTest {
 
+    @Autowired
+    private UserService service;
+
+    private UserController controller;
     private static User user;
 
-    @Autowired
-    private TestRestTemplate restTemplate;
-
-    private static final String BASE_URL = "/api/users";
-
     @BeforeAll
-    public static void setup() {
+    static void init() {
         user = UserFactory.createUser(
                 "Jon",
                 "Doe",
                 "doe123",
                 Role.CUSTOMER,
-                "jon@example.com",
+                "jon_controller@example.com",
                 "0123456789"
         );
+    }
+
+    @BeforeEach
+    void setup() {
+        controller = new UserController(service);
     }
 
     @Test
     @Order(1)
     void a_create() {
-        String url = BASE_URL + "/create";
-        ResponseEntity<User> postResponse = this.restTemplate.postForEntity(url, user, User.class);
-        assertNotNull(postResponse.getBody());
-        user = postResponse.getBody();
+        ResponseEntity<?> response = controller.createUser(user);
+        assertEquals(200, response.getStatusCodeValue());
+        User created = (User) response.getBody();
+        assertNotNull(created);
+        assertNotNull(created.getUserId());
+        user = created;
     }
 
     @Test
     @Order(2)
     void b_read() {
-        String url = BASE_URL + "/read/" + user.getUserId();
-        ResponseEntity<User> response = this.restTemplate.getForEntity(url, User.class);
-        assertEquals(user.getUserId(), response.getBody().getUserId());
+        User read = controller.getUserById(user.getUserId());
+        assertNotNull(read);
+        assertEquals(user.getUserId(), read.getUserId());
     }
 
     @Test
@@ -61,31 +69,108 @@ class UserControllerTest {
                 .setLastName("Johnson")
                 .build();
 
-        String url = BASE_URL + "/update/" + user.getUserId();
-        this.restTemplate.put(url, updatedUser);
-
-        ResponseEntity<User> response = this.restTemplate.getForEntity(BASE_URL + "/read/" + user.getUserId(), User.class);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals("Johnson", response.getBody().getLastName());
+        User updated = controller.updateUser(user.getUserId(), updatedUser);
+        assertNotNull(updated);
+        assertEquals("Johnson", updated.getLastName());
+        user = updated;
     }
 
     @Test
     @Order(4)
-    void d_delete() {
-        String url = BASE_URL + "/delete/" + user.getUserId();
-        this.restTemplate.delete(url);
+    void d_partialUpdate() {
+        User patchUser = new User.Builder()
+                .copy(user)
+                .setFirstName("Johnny")
+                .build();
 
-        ResponseEntity<User> response = this.restTemplate.getForEntity(BASE_URL + "/read/" + user.getUserId(), User.class);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNull(response.getBody());
+        User patched = controller.partialUpdateUser(user.getUserId(), patchUser);
+        assertNotNull(patched);
+        assertEquals("Johnny", patched.getFirstName());
+        user = patched;
     }
 
     @Test
     @Order(5)
-    void e_getAll() {
-        String url = BASE_URL + "/getAll";
-        ResponseEntity<User[]> response = this.restTemplate.getForEntity(url, User[].class);
-        assertNotNull(response.getBody());
+    void e_delete() {
+        controller.deleteUser(user.getUserId());
+        User deleted = controller.getUserById(user.getUserId());
+        assertNull(deleted);
+    }
+
+    @Test
+    @Order(6)
+    void f_getAll() {
+        List<User> allUsers = controller.getAll();
+        assertNotNull(allUsers);
+    }
+
+    @Test
+    @Order(7)
+    void g_login() {
+        String uniqueEmail = "alice" + System.currentTimeMillis() + "@example.com";
+
+        controller.createUser(UserFactory.createUser(
+                "Alice",
+                "Smith",
+                "alice123",
+                Role.CUSTOMER,
+                uniqueEmail,
+                "0987654321"
+        ));
+
+        LoginRequest loginRequest = new LoginRequest(uniqueEmail, "alice123", "CUSTOMER");
+        ResponseEntity<UserResponse> response = controller.login(loginRequest);
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCodeValue());
+        UserResponse loggedIn = response.getBody();
+        assertNotNull(loggedIn);
+        assertEquals(uniqueEmail, loggedIn.getEmail());
+        assertEquals(Role.CUSTOMER, loggedIn.getRole());
+    }
+
+    @Test
+    @Order(8)
+    void h_login_wrongPassword() {
+        String uniqueEmail = "bob" + System.currentTimeMillis() + "@example.com";
+
+        controller.createUser(UserFactory.createUser(
+                "Bob",
+                "Marley",
+                "bob123",
+                Role.CUSTOMER,
+                uniqueEmail,
+                "0112233445"
+        ));
+
+        LoginRequest loginRequest = new LoginRequest(uniqueEmail, "wrongpass", "CUSTOMER");
+        ResponseEntity<UserResponse> response = controller.login(loginRequest);
+        assertEquals(401, response.getStatusCodeValue());
+    }
+
+    @Test
+    @Order(9)
+    void i_login_wrongRole() {
+        String uniqueEmail = "carol" + System.currentTimeMillis() + "@example.com";
+
+        controller.createUser(UserFactory.createUser(
+                "Carol",
+                "Danvers",
+                "carol123",
+                Role.CUSTOMER,
+                uniqueEmail,
+                "0998877665"
+        ));
+
+        LoginRequest loginRequest = new LoginRequest(uniqueEmail, "carol123", "ADMIN");
+        ResponseEntity<UserResponse> response = controller.login(loginRequest);
+        assertEquals(403, response.getStatusCodeValue());
+    }
+
+    @Test
+    @Order(10)
+    void j_login_userNotFound() {
+        LoginRequest loginRequest = new LoginRequest("nonexistent@example.com", "nopass", "CUSTOMER");
+        ResponseEntity<UserResponse> response = controller.login(loginRequest);
+        assertEquals(404, response.getStatusCodeValue());
     }
 }

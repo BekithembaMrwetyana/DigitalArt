@@ -1,49 +1,54 @@
 package za.ac.cput.controller;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.User;
 import za.ac.cput.dto.LoginRequest;
+import za.ac.cput.dto.UserResponse;
 import za.ac.cput.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:5173")
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/users")
 public class UserController {
 
     private final UserService service;
 
-    @Autowired
     public UserController(UserService service) {
         this.service = service;
     }
 
     @PostMapping("/create")
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        User created = service.create(user);
-        return ResponseEntity.ok(created);
+    public ResponseEntity<?> createUser(@RequestBody User user) {
+        try {
+            User created = service.create(user);
+            return ResponseEntity.ok(created);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        }
     }
 
     @GetMapping("/read/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        User user = service.read(id);
-        return ResponseEntity.ok(user);
+    public User getUserById(@PathVariable Long id) {
+        return service.read(id);
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
+    public User updateUser(@PathVariable Long id, @RequestBody User user) {
         user.setUserId(id);
-        User updated = service.update(user);
-        return ResponseEntity.ok(updated);
+        return service.update(user);
+    }
+
+    @PatchMapping("/update/{id}")
+    public User partialUpdateUser(@PathVariable Long id, @RequestBody User user) {
+        user.setUserId(id);
+        return service.partialUpdate(user);
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    public void deleteUser(@PathVariable Long id) {
         service.delete(id);
-        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/getAll")
@@ -52,11 +57,30 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<User> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<UserResponse> login(@RequestBody LoginRequest loginRequest) {
         User user = service.getByEmail(loginRequest.getEmail());
-        if (user != null && user.getPassword().equals(loginRequest.getPassword())) {
-            return ResponseEntity.ok(user);
+
+        if (user == null) {
+            return ResponseEntity.status(404).build();
         }
-        return ResponseEntity.status(401).build();
+
+        if (!user.getPassword().equals(loginRequest.getPassword())) {
+            return ResponseEntity.status(401).build();
+        }
+
+        if (!user.getRole().name().equalsIgnoreCase(loginRequest.getRole())) {
+            return ResponseEntity.status(403).build();
+        }
+
+        UserResponse response = new UserResponse(
+                user.getUserId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getPhoneNumber(),
+                user.getRole()
+        );
+
+        return ResponseEntity.ok(response);
     }
 }

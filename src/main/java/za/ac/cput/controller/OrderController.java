@@ -75,11 +75,24 @@ public class OrderController {
 
     // Get orders by userId
     @CrossOrigin(origins = "http://localhost:5173")
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Order>> getOrdersByUserId(@PathVariable Long userId) {
-        List<Order> orders = service.getOrdersByUserId(userId);
-        return ResponseEntity.ok(orders);
+   @GetMapping("/user/{userId}")
+   public ResponseEntity<List<Order>> getOrdersByUserId(@PathVariable Long userId) {
+       List<Order> orders = service.getOrdersByUserId(userId);
+       return ResponseEntity.ok(orders);
+  }
+    @GetMapping("/user/{userId}/status/{status}")
+    public ResponseEntity<List<Order>> getOrdersByUserIdAndStatus(
+            @PathVariable Long userId,
+            @PathVariable String status) {
+        try {
+            OrderStatus orderStatus = OrderStatus.valueOf(status.toUpperCase());
+            List<Order> orders = service.getOrdersByUserIdAndStatus(userId, orderStatus);
+            return ResponseEntity.ok(orders);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build(); // invalid status
+        }
     }
+
     @GetMapping("/test")
     public ResponseEntity<List<Order>> testOrders() {
         List<Order> orders = service.getOrdersByUserId(10L);
