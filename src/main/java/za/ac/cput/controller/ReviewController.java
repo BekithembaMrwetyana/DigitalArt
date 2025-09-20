@@ -39,6 +39,12 @@ public class ReviewController {
         return reviewService.getAll();
     }
 
+
+    @GetMapping("/product/{productId}")
+    public List<Review> getReviewsByProduct(@PathVariable Long productId) {
+        return reviewService.getReviewsByProduct(productId);
+    }
+
 }
 
 

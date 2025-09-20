@@ -78,4 +78,9 @@ public class ReviewService implements IReviewService  {
     public List<Review> getAll() {
         return reviewRepository.findAll();
     }
+
+    public List<Review> getReviewsByProduct(Long productId) {
+        return reviewRepository.findReviewByProduct_ProductID(productId);
+    }
+
 }
