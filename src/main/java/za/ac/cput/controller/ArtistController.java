@@ -10,7 +10,8 @@ import za.ac.cput.service.ArtistService;
 import java.util.List;
 
 @RestController
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:5173") // replace with your frontend port
+
 @RequestMapping("/api/artist")
 public class ArtistController {
 
