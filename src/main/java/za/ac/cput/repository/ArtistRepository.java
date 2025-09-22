@@ -2,16 +2,17 @@ package za.ac.cput.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import za.ac.cput.domain.ArtBrand;
+
+import za.ac.cput.domain.Artist;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 @Repository
-public interface ArtBrandRepository extends JpaRepository<ArtBrand, Long> {
+public interface ArtistRepository extends JpaRepository<Artist, Long> {
 
-    Optional<ArtBrand> findByBrandName(String brandName);
+    Optional<Artist> findByArtistName(String artistName);
 
-    List<ArtBrand> findByCreationDateAfter(LocalDate date);
+    List<Artist> findByCreationDateAfter(LocalDate date);
 
 }

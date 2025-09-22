@@ -1,15 +1,15 @@
 package za.ac.cput.factory;
 
-import za.ac.cput.domain.ArtBrand;
+import za.ac.cput.domain.Artist;
 import java.time.LocalDate;
 
-public class ArtBrandFactory {
+public class ArtistFactory {
 
-    public static ArtBrand createArtBrand(String brandName, String imageUrl, String description, LocalDate creationDate) {
+    public static Artist createArtist(String artistName, String imageUrl, String description, LocalDate creationDate) {
 
-        // Validate brand name
-        if (brandName == null || brandName.isBlank()) {
-            throw new IllegalArgumentException("Brand name is required");
+        // Validate  name
+        if (artistName == null || artistName.isBlank()) {
+            throw new IllegalArgumentException("Artist name is required");
         }
 
         // Validate image URL
@@ -27,8 +27,9 @@ public class ArtBrandFactory {
             throw new IllegalArgumentException("Creation date is invalid");
         }
 
-        return new ArtBrand.Builder()
-                .setBrandName(brandName)
+        // ✅ Use the Builder
+        return new Artist.Builder()
+                .setArtistName(artistName)
                 .setImageUrl(imageUrl)
                 .setDescription(description)
                 .setCreationDate(creationDate)
