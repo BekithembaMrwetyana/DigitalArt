@@ -40,6 +40,21 @@ public class ArtistDataInitializer implements CommandLineRunner {
                 LocalDate.now()
         );
 
+        Artist a4 = ArtistFactory.createArtist(
+                "Abethu Ngxitho",
+                "http://localhost:8080/digital_artDB/images/art1.jpeg",
+                "From the Western Cape, this young artist transforms simple moments into vivid, imaginative scenes. Her work combines gentle details with bright, playful colors, encouraging viewers to explore their own emotions and stories within each piece.",
+                LocalDate.now()
+        );
+
+        Artist a5 = ArtistFactory.createArtist(
+                "MpiloEnhle Mzimela",
+                "http://localhost:8080/digital_artDB/images/art3.jpeg",
+                "Hailing from Gauteng, this young artist captures everyday life with a fresh and colorful perspective. Her artworks invite viewers to pause, reflect, and imagine their own stories within each scene",
+                LocalDate.now()
+        );
+
+
 
 
 
@@ -57,6 +72,18 @@ public class ArtistDataInitializer implements CommandLineRunner {
                 .noneMatch(a -> a.getArtistName().equals(a3.getArtistName()))) {
             artistService.create(a3);
         }
+
+        if (artistService.getAll().stream()
+                .noneMatch(a -> a.getArtistName().equals(a4.getArtistName()))) {
+            artistService.create(a4);
+        }
+
+        if (artistService.getAll().stream()
+                .noneMatch(a -> a.getArtistName().equals(a5.getArtistName()))) {
+            artistService.create(a5);
+        }
+
+
 
         System.out.println("ArtistDataInitializer: Artists seeded!");
     }
