@@ -1,27 +1,22 @@
 package za.ac.cput.dto;
 
+import za.ac.cput.domain.Product;
+
 public class CartItemDTO {
     private Long cartItemID;
-    private Long productID;
-    private String title;
-    private int quantity;
+    private Product product;   // full product object
     private double price;
     private Long userId;
 
-    public CartItemDTO(Long cartItemID, Long productID, String title, int quantity, double price, Long userId) {
+    public CartItemDTO(Long cartItemID, Product product, double price, Long userId) {
         this.cartItemID = cartItemID;
-        this.productID = productID;
-        this.title = title;
-        this.quantity = quantity;
+        this.product = product;
         this.price = price;
         this.userId = userId;
     }
 
-    // Getters & setters
     public Long getCartItemID() { return cartItemID; }
-    public Long getProductID() { return productID; }
-    public String getTitle() { return title; }
-    public int getQuantity() { return quantity; }
+    public Product getProduct() { return product; }
     public double getPrice() { return price; }
     public Long getUserId() { return userId; }
 }

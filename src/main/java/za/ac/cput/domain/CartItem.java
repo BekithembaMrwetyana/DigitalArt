@@ -11,18 +11,17 @@ Date: 25/05/2025
 */
 
 @Entity
-@Table(name = "cart_item" )
+@Table(
+        name = "cart_item",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "product_id"}) // enforce uniqueness
+)
 public class CartItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long cartItemID; //change to Long
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cartID")
-    private Cart cart;
+    private Long cartItemID;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "product_id", nullable = false)
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Product product;
 
@@ -31,12 +30,15 @@ public class CartItem {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private User user;
 
+    @Column(name = "price", nullable = false)
+    private double price;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cartID")
+    private Cart cart;
+
     @Column(name = "quantity", nullable = false)
     private int quantity;
-
-    //add price
-    @Column(name = "price",nullable = false)
-    private double price;
 
     protected CartItem() {
     }

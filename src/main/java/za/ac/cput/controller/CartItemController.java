@@ -18,7 +18,6 @@ import java.util.List;
 @RestController
 @CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/cart_item")
-@CrossOrigin(origins = "http://localhost:5173")
 public class CartItemController {
 
     private final CartItemService service;
@@ -33,38 +32,20 @@ public class CartItemController {
         return service.create(cartItem);
     }
 
-    @GetMapping("/read/{cartItemId}")
-    public CartItem read(@PathVariable Long cartItemId) {
-        return service.read(cartItemId);
-    }
-
-    @PutMapping("/update")
-    public CartItem update(@RequestBody CartItem cartItem) {
-        return service.update(cartItem);
-    }
-
     @DeleteMapping("/delete/{cartItemId}")
     public void delete(@PathVariable Long cartItemId) {
         service.delete(cartItemId);
     }
 
-    @GetMapping("/getAll")
-    public List<CartItem> getAll() {
-        return service.getAll();
-    }
-
     @GetMapping("/findByUser/{userId}")
     public List<CartItemDTO> getCartItemsByUser(@PathVariable Long userId) {
-        List<CartItem> items = service.findByUserId(userId);
-
-        return items.stream().map(item -> new CartItemDTO(
-                item.getCartItemID(),
-                item.getProduct() != null ? item.getProduct().getProductID() : null,
-                item.getProduct() != null ? item.getProduct().getTitle() : "Unnamed Product",
-                item.getQuantity(),
-                item.getPrice(),
-                item.getUser() != null ? item.getUser().getUserId() : null
-        )).toList();
+        return service.findByUserId(userId)
+                .stream()
+                .map(item -> new CartItemDTO(
+                        item.getCartItemID(),
+                        item.getProduct(),
+                        item.getPrice(),
+                        item.getUser().getUserId()
+                )).toList();
     }
-
 }

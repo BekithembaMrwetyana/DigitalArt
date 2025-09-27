@@ -19,11 +19,6 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
 
     List<CartItem> findByUser_UserId(Long userId);
     //List<CartItem> findByUserIdWithProducts(@Param("userId") Long userId);
+    boolean existsByUser_UserIdAndProduct_ProductID(Long userId, Long productId); // prevent duplicates
 
-
-    List<CartItem> findByCart(Cart cart);
-
-    List<CartItem>findByProduct(Product product);
-
-    List<CartItem> findByQuantityGreaterThan(int quantity);
 }

@@ -20,45 +20,40 @@ public class CartItemService implements ICartItemService {
     private final CartItemRepository cartItemRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
-    private final CategoryRepository categoryRepository;
 
     @Autowired
     public CartItemService(CartItemRepository cartItemRepository,
                            UserRepository userRepository,
-                           ProductRepository productRepository,
-                           CategoryRepository categoryRepository) {
+                           ProductRepository productRepository) {
         this.cartItemRepository = cartItemRepository;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
-        this.categoryRepository = categoryRepository;
     }
 
     @Override
     public CartItem create(CartItem cartItem) {
-        Long userId = cartItem.getUser() != null ? cartItem.getUser().getUserId() : null;
-        if (userId == null) {
-            throw new IllegalArgumentException("User ID is required");
+        Long userId = cartItem.getUser().getUserId();
+        Long productId = cartItem.getProduct().getProductID();
+
+        if (cartItemRepository.existsByUser_UserIdAndProduct_ProductID(userId, productId)) {
+            throw new IllegalArgumentException("Product already in cart");
         }
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-
-        Product product = cartItem.getProduct();
-        if (product != null && product.getProductID() != null) {
-            product = productRepository.findById(product.getProductID())
-                    .orElseThrow(() -> new IllegalArgumentException("Product not found"));
-        }
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
         CartItem savedCartItem = new CartItem.Builder()
-                .setCart(cartItem.getCart())
-                .setProduct(product)
-                .setQuantity(cartItem.getQuantity())
-                .setPrice(cartItem.getPrice())
                 .setUser(user)
+                .setProduct(product)
+                .setPrice(product.getPrice()) // price always from product
+                .setCart(cartItem.getCart())  // if you’re using Cart entity
                 .build();
+
 
         return cartItemRepository.save(savedCartItem);
     }
-
 
     @Override
     public CartItem read(Long cartItemId) {
@@ -67,7 +62,7 @@ public class CartItemService implements ICartItemService {
 
     @Override
     public CartItem update(CartItem cartItem) {
-        return cartItemRepository.save(cartItem);
+        throw new UnsupportedOperationException("Cart items cannot be updated. Remove and re-add instead.");
     }
 
     @Override
@@ -83,5 +78,4 @@ public class CartItemService implements ICartItemService {
     public List<CartItem> findByUserId(Long userId) {
         return cartItemRepository.findByUser_UserId(userId);
     }
-
 }
