@@ -13,12 +13,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CartItemRepository extends JpaRepository<CartItem, Long> {
 
     List<CartItem> findByUser_UserId(Long userId);
-    //List<CartItem> findByUserIdWithProducts(@Param("userId") Long userId);
-    boolean existsByUser_UserIdAndProduct_ProductID(Long userId, Long productId); // prevent duplicates
-
+    boolean existsByUser_UserIdAndProduct_ProductID(Long userId, Long productId);
+    Optional<CartItem> findByUser_UserIdAndProduct_ProductID(Long userId, Long productId);
 }

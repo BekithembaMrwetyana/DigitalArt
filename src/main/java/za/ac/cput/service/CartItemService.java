@@ -4,14 +4,13 @@ package za.ac.cput.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import za.ac.cput.domain.CartItem;
-import za.ac.cput.domain.Category;
 import za.ac.cput.domain.Product;
 import za.ac.cput.domain.User;
 import za.ac.cput.repository.CartItemRepository;
-import za.ac.cput.repository.CategoryRepository;
 import za.ac.cput.repository.ProductRepository;
 import za.ac.cput.repository.UserRepository;
 
+import java.util.Base64;
 import java.util.List;
 
 @Service
@@ -35,25 +34,34 @@ public class CartItemService implements ICartItemService {
         Long userId = cartItem.getUser().getUserId();
         Long productId = cartItem.getProduct().getProductID();
 
-        if (cartItemRepository.existsByUser_UserIdAndProduct_ProductID(userId, productId)) {
-            throw new IllegalArgumentException("Product already in cart");
-        }
-
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
-        CartItem savedCartItem = new CartItem.Builder()
+        // check if product already in cart
+        CartItem existing = cartItemRepository.findByUser_UserIdAndProduct_ProductID(userId, productId)
+                .orElse(null);
+
+        if (existing != null) {
+            CartItem updated = new CartItem.Builder()
+                    .copy(existing)
+                    .setQuantity(existing.getQuantity() + cartItem.getQuantity())
+                    .setPrice(product.getPrice())
+                    .build();
+            return cartItemRepository.save(updated);
+        }
+
+        CartItem newItem = new CartItem.Builder()
+                .copy(cartItem)
                 .setUser(user)
                 .setProduct(product)
-                .setPrice(product.getPrice()) // price always from product
-                .setCart(cartItem.getCart())  // if you’re using Cart entity
+                .setPrice(product.getPrice())
                 .build();
 
-
-        return cartItemRepository.save(savedCartItem);
+        return cartItemRepository.save(newItem);
     }
+
 
     @Override
     public CartItem read(Long cartItemId) {
@@ -75,7 +83,19 @@ public class CartItemService implements ICartItemService {
         return cartItemRepository.findAll();
     }
 
-    public List<CartItem> findByUserId(Long userId) {
-        return cartItemRepository.findByUser_UserId(userId);
+    private void encodeImage(Product product) {
+        if (product.getImageData() != null) {
+            product.setImageBase64(Base64.getEncoder().encodeToString(product.getImageData()));
+        } else {
+            product.setImageBase64(null);
+        }
     }
+
+    public List<CartItem> findByUserId(Long userId) {
+        List<CartItem> items = cartItemRepository.findByUser_UserId(userId);
+        // encode the images before returning
+        items.forEach(item -> encodeImage(item.getProduct()));
+        return items;
+    }
+
 }

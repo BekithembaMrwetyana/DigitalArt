@@ -38,7 +38,7 @@ public class CartItem {
     private Cart cart;
 
     @Column(name = "quantity", nullable = false)
-    private int quantity;
+    private int quantity = 1;
 
     protected CartItem() {
     }
