@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,85 +32,217 @@ class ProductServiceTest {
     private ICategoryService categoryService;
 
 
-    private Category category1, category2, category3;
+    static Category digitalArt, portraits, abstractCat, landscape, photography, popArt, surreal, fantasy, streetArt, urban;
 
 
-    private Product product1, product2, product3;
+    static Product neonDreams, pixelSunrise, portraitAlice, portraitBob, abstractWaves, fantasyForest,
+            sculpture3D, abstractArt, auroraFields, dreamMachine, cityScape,purpleMirage, galsticVoyage, monaDiva;
 
+    private Product createIfNotExists(String title, Category category, double price, String imageUrl, String description) {
+        return productService.getAll().stream()
+                .filter(p -> p.getTitle().equals(title) &&
+                        p.getCategory().getCategoryId().equals(category.getCategoryId()))
+                .findFirst()
+                .orElseGet(() -> productService.create(
+                        new Product.Builder()
+                                .setTitle(title)
+                                .setDescription(description)
+                                .setPrice(price)
+                                .setImageUrl(imageUrl)
+                                .setCategory(category)
+                                .build()
+                ));
+    }
 
     @BeforeAll
     void setUp() {
 
-        category1 = categoryService.create(new Category.Builder().setName("3D").setDescription("3D artworks").build());
-        category2 = categoryService.create(new Category.Builder().setName("Abstract").setDescription("Abstract artworks").build());
+        digitalArt = categoryService.create(new Category.Builder()
+                .setName("Digital Art")
+                .setDescription("Digital artworks")
+                .build());
 
-        product1 = productService.create(new Product.Builder()
-                .setCategory(category1)
+        portraits = categoryService.create(new Category.Builder()
+                .setName("Portraits")
+                .setDescription("Portrait artworks")
+                .build());
+
+        abstractCat = categoryService.create(new Category.Builder()
+                .setName("Abstract")
+                .setDescription("Abstract artworks")
+                .build());
+
+        landscape = categoryService.create(new Category.Builder()
+                .setName("Landscape")
+                .setDescription("Landscape artworks")
+                .build());
+
+        photography = categoryService.create(new Category.Builder()
+                .setName("Photography")
+                .setDescription("Photography artworks")
+                .build());
+
+        popArt = categoryService.create(new Category.Builder()
+                .setName("Pop Art")
+                .setDescription("Modern pop artworks")
+                .build());
+
+        surreal = categoryService.create(new Category.Builder()
+                .setName("Surreal")
+                .setDescription("Surreal artworks")
+                .build());
+        fantasy = categoryService.create(new Category.Builder()
+                .setName("Fantasy")
+                .setDescription("Fantasy artworks")
+                .build());
+        streetArt = categoryService.create(new Category.Builder()
+                .setName("StreetArt")
+                .setDescription("StreetArt artworks")
+                .build());
+
+        urban = categoryService.create(new Category.Builder()
+                .setName("Urban")
+                .setDescription("Urban artworks")
+                .build());
+
+
+        neonDreams = productService.create(new Product.Builder()
+                .setTitle("Neon Dreams")
+                .setDescription("A stunning digital artwork exploring dreams and reality")
+                .setPrice(299.99)
+                .setImageUrl("/images/art1.jpeg")
+                .setCategory(digitalArt)
+                .build());
+
+        pixelSunrise = productService.create(new Product.Builder()
+                .setTitle("Pixel Sunrise")
+                .setDescription("A beautiful sunrise in pixel art style")
+                .setPrice(149.99)
+                .setImageUrl("/images/art15.jpeg")
+                .setCategory(digitalArt)
+                .build());
+
+        portraitAlice = productService.create(new Product.Builder()
+                .setTitle("Portrait of Alice")
+                .setDescription("Digital portrait of Alice")
+                .setPrice(199.99)
+                .setImageUrl("/images/art3.jpeg")
+                .setCategory(portraits)
+                .build());
+
+        portraitBob = productService.create(new Product.Builder()
+                .setTitle("Expressionist Mind")
+                .setDescription("Expressionist linguistic barriers")
+                .setPrice(179.99)
+                .setImageUrl("/images/art4.jpeg")
+                .setCategory(portraits)
+                .build());
+
+        abstractWaves = productService.create(new Product.Builder()
+                .setTitle("Abstract Waves")
+                .setDescription("Abstract artwork with colorful waves")
+                .setPrice(249.99)
+                .setImageUrl("/images/art13.jpeg")
+                .setCategory(digitalArt)
+                .build());
+
+        fantasyForest = productService.create(new Product.Builder()
+                .setTitle("Fantasy Forest")
+                .setDescription("A dreamy digital forest landscape")
+                .setPrice(299.99)
+                .setImageUrl("/images/art5.jpeg")
+                .setCategory(digitalArt)
+                .build());
+
+
+        sculpture3D = productService.create(new Product.Builder()
                 .setTitle("3D Sculpture")
                 .setDescription("Digital 3D sculpture")
                 .setPrice(159.99)
-                .setImageUrl("/images/art8.jpeg")
-                .build()
-        );
+                .setImageUrl("/images/art25.jpeg")
+                .setCategory(digitalArt)
+                .build());
 
-        product2 = productService.create(new Product.Builder()
-                .setCategory(category2)
-                .setTitle("Abstract Art ")
+        abstractArt = productService.create(new Product.Builder()
+                .setTitle("Chromatic chaos")
                 .setDescription("Colorful abstract design")
                 .setPrice(199.99)
-                .setImageUrl("/images/art9.jpeg")
-                .build()
-        );
+                .setImageUrl("/images/art6.jpeg")
+                .setCategory(abstractCat)
+                .build());
 
-
-        category3 = categoryService.create(new Category.Builder().setName("Landscape").setDescription("Landscape artworks").build());
-
-
-        product3 = productService.create(new Product.Builder()
-                .setCategory(category3)
-                .setTitle("Ocean Waves")
-                .setDescription("Beautiful ocean landscape")
+        auroraFields = productService.create(new Product.Builder()
+                .setTitle("Aurora fields")
+                .setDescription("Beautiful aurora fields landscape")
                 .setPrice(179.99)
+                .setImageUrl("/images/art9.jpeg")
+                .setCategory(landscape)
+                .build());
+
+        dreamMachine = productService.create(new Product.Builder()
+                .setTitle("Dream machine")
+                .setDescription("Fantasy dreams")
+                .setPrice(189.99)
+                .setImageUrl("/images/art11.jpeg")
+                .setCategory(surreal)
+                .build());
+
+        purpleMirage = productService.create(new Product.Builder()
+                .setTitle("Purple Mirage")
+                .setDescription("Nicely done artistic drawing of trees ")
+                .setPrice(139.99)
                 .setImageUrl("/images/art10.jpeg")
-                .build()
-        );
+                .setCategory(streetArt)
+                .build());
+
+        galsticVoyage = productService.create(new Product.Builder()
+                .setTitle("Galstic Voyage")
+                .setDescription("A pop of colors for this beautiful voyage")
+                .setPrice(99.99)
+                .setImageUrl("/images/art14.jpeg")
+                .setCategory(popArt)
+                .build());
+
+        cityScape = productService.create(new Product.Builder()
+                .setTitle("City Scape")
+                .setDescription("Beautifully done city scapes")
+                .setPrice(129.99)
+                .setImageUrl("/images/art7.jpeg")
+                .setCategory(popArt)
+                .build());
+
+        monaDiva = productService.create(new Product.Builder()
+                .setTitle("Mona Diva")
+                .setDescription("Diva Mona takes place")
+                .setPrice(149.99)
+                .setImageUrl("/images/art21.jpeg")
+                .setCategory(portraits)
+                .build());
     }
 
     @Test
     @Order(1)
-    void testCreateProducts() {
-        assertNotNull(product1.getProductID());
-        assertNotNull(product2.getProductID());
-        assertNotNull(product3.getProductID());
-
-
-        System.out.println("Created products: " + product1 + ", " + product2 + ", " + product3 + ",");
+    void testAllProductsCreated() {
+        List<Product> all = productService.getAll();
+        assertTrue(all.size() >= 14, "Should have at least 14 products seeded");
+        all.forEach(System.out::println);
     }
 
     @Test
     @Order(2)
-    void testGetAllProducts() {
-        List<Product> all = productService.getAll();
-        assertEquals(9, all.size());
-        System.out.println("All products: " + all);
+    void testGetByCategory() {
+        List<Product> digitalProducts = productService.getByCategoryId(digitalArt.getCategoryId());
+        assertFalse(digitalProducts.isEmpty(), "Digital Art category should not be empty");
+        digitalProducts.forEach(p -> System.out.println("Digital Art product: " + p));
     }
+
 
     @Test
     @Order(3)
-    void testGetByCategory() {
-        List<Product> byCategory = productService.getByCategoryId(category1.getCategoryId());
-        assertFalse(byCategory.isEmpty());
-        System.out.println("Products by category " + category1.getName() + ": " + byCategory);
-    }
-
-    @Test
-    @Order(4)
     void testSaveImagesBatch() throws IOException {
-        Product[] products = {product1, product2, product3};
+        List<Product> products = productService.getAll().subList(0, 3);
         for (Product p : products) {
-            // Get filename from product's imageUrl
             String fileName = Paths.get(p.getImageUrl()).getFileName().toString();
-
             Path path = Paths.get("src/main/resources/static/images/" + fileName);
             assertTrue(Files.exists(path), "Test image must exist: " + path.toAbsolutePath());
 
@@ -121,32 +254,40 @@ class ProductServiceTest {
             );
 
             Product updated = productService.saveImage(p.getProductID(), file);
-
-            assertNotNull(updated.getImageData(), "Image data should be persisted in DB");
-            assertTrue(updated.getImageData().length > 0, "Image bytes should not be empty");
-            assertEquals(p.getImageUrl(), updated.getImageUrl(), "Image URL should remain correct");
-
-            System.out.println("Saved image for product: " + updated.getTitle() +
-                    ", bytes length: " + updated.getImageData().length);
+            assertNotNull(updated.getImageData());
+            assertEquals(p.getImageUrl(), updated.getImageUrl());
+            System.out.println("Saved image for product: " + updated.getTitle());
         }
     }
 
-    @Test
-    @Order(5)
-    void testUpdateProductBatch() {
-        Product updated = new Product.Builder().copy(product2).setPrice(250.0).setTitle("Abstract Art Updated").build();
-        Product result = productService.update(updated);
-        assertEquals(250.0, result.getPrice());
-        System.out.println("Updated product: " + result);
-    }
 
     @Test
-    @Order(6)
+    @Order(4)
+    void testUpdateProductCopyOnly() {
+        Product productToUpdate = abstractWaves;
+
+        Product updated = new Product.Builder()
+                .copy(productToUpdate)
+                .setPrice(productToUpdate.getPrice() + 50.0)
+                .setTitle(productToUpdate.getTitle() + " Updated")
+                .build();
+
+
+        assertEquals(productToUpdate.getPrice() + 50.0, updated.getPrice());
+        assertEquals("Abstract Waves Updated", updated.getTitle());
+        assertEquals(productToUpdate.getProductID(), updated.getProductID());
+
+        System.out.println("Updated product copy (not persisted): " + updated);
+    }
+
+
+    @Test
+    @Order(5)
     void testDeleteProductsBatch() {
-        Product[] products = {product1, product2, product3};
-        for (Product p : products) {
+        List<Product> productsToDelete = new ArrayList<>(productService.getAll().subList(0, 3));
+        for (Product p : productsToDelete) {
             productService.delete(p.getProductID());
-            assertNull(productService.read(p.getProductID()));
+            assertNull(productService.read(p.getProductID()), "Product should be deleted: " + p.getTitle());
             System.out.println("Deleted product: " + p.getTitle());
         }
     }

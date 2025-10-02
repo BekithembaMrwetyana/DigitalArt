@@ -15,10 +15,8 @@ public class CategoryFactory {
 
     public static Category createCategory(String name, String description) {
 
-        //String categoryId = Helper.generateId();
-
-        if(Helper.isNullOrEmpty(name) || Helper.isNullOrEmpty(description)) {
-            return null;
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Category name cannot be null or empty");
         }
 
 

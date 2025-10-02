@@ -1,14 +1,18 @@
 package za.ac.cput.repository;
 
 
+import za.ac.cput.domain.Category;
 import za.ac.cput.domain.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
+
+    Optional<Product> findByTitleAndCategory(String title, Category category);
 
     List<Product> findAllByCategory_CategoryId(Long categoryId);
 

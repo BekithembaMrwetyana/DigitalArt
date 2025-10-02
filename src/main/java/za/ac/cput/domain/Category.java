@@ -9,6 +9,8 @@ Date: 07 May 2025
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Table(name = "category")
@@ -18,7 +20,9 @@ public class Category {
     private Long categoryId;
     private String name;
     private String description;
-    private String catergoryImage;
+
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
+    private List<Product> products;
 
    protected Category() {
 
@@ -28,7 +32,7 @@ public class Category {
         this.categoryId = builder.categoryId;
         this.name = builder.name;
         this.description = builder.description;
-        this.catergoryImage = builder.categoryImage;
+
     }
 
     public Long getCategoryId() {
@@ -39,13 +43,8 @@ public class Category {
         return name;
     }
 
-    public String getDescription() {
-        return description;
-    }
+    public String getDescription() {return description;}
 
-    public String getCatergoryImage() {
-        return catergoryImage;
-    }
 
     @Override
     public String toString() {
@@ -53,7 +52,7 @@ public class Category {
                 "categoryId=" + categoryId +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", catergoryImage='" + catergoryImage + '\'' +
+
                 '}';
     }
 
@@ -61,7 +60,7 @@ public class Category {
         private Long categoryId;
         private String name;
         private String description;
-        private String categoryImage;
+
 
         public Builder setCategoryId(Long categoryId) {
             this.categoryId = categoryId;
@@ -78,16 +77,13 @@ public class Category {
             return this;
         }
 
-        public Builder setCategoryImage(String categoryImage) {
-            this.categoryImage = categoryImage;
-            return this;
-        }
+
 
         public Builder copy(Category category) {
             this.categoryId = category.categoryId;
             this.name = category.name;
             this.description = category.description;
-            this.categoryImage = category.catergoryImage;
+
             return this;
         }
 

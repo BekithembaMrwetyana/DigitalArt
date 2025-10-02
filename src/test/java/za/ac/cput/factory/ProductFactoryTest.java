@@ -7,32 +7,29 @@ Author: Thimna Gogwana 222213973
 Date: 25 May 2025
 */
 
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.BeforeAll;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.*;
 import za.ac.cput.domain.Category;
 import za.ac.cput.domain.Product;
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ProductFactoryTest {
 
-    @Autowired
     private ProductFactory productFactory;
 
-    private static Product product1;
-    private static Product product2;
-    private static Category category1;
-    private static Category category2;
+    private Product product1;
+    private Product product2;
+    private Category category1;
+    private Category category2;
 
     @BeforeAll
-    static void setUpCategories() {
+    void setUp() {
+
+        productFactory = new ProductFactory();
+
+
         category1 = new Category.Builder()
                 .setCategoryId(1001L)
                 .setName("Portraits")
@@ -49,8 +46,11 @@ class ProductFactoryTest {
     @Test
     @Order(1)
     void a_createProducts() {
-        product1 = productFactory.create(1L, category1, "Portrait Art", "Digital portrait of a person", 150.0, "art6.jpeg");
-        product2 = productFactory.create(2L, category2, "Abstract Art", "Colorful abstract design", 200.0, "art5.jpeg");
+        product1 = productFactory.create(1L, category1, "Portrait Art",
+                "Digital portrait of a person", 150.0, "art6.jpeg");
+
+        product2 = productFactory.create(2L, category2, "Abstract Art",
+                "Colorful abstract design", 200.0, "art5.jpeg");
 
         assertNotNull(product1);
         assertEquals("Portrait Art", product1.getTitle());
@@ -67,19 +67,31 @@ class ProductFactoryTest {
         Product copy1 = productFactory.copy(product1);
         Product copy2 = productFactory.copy(product2);
 
+        assertNotNull(copy1);
+        assertNotSame(product1, copy1);
         assertEquals(product1.getTitle(), copy1.getTitle());
+        assertEquals(product1.getCategory(), copy1.getCategory());
+
+        assertNotNull(copy2);
+        assertNotSame(product2, copy2);
         assertEquals(product2.getTitle(), copy2.getTitle());
+        assertEquals(product2.getCategory(), copy2.getCategory());
     }
 
     @Test
     @Order(3)
     void c_updateProductImage() {
         byte[] fakeImageData = {1, 2, 3, 4, 5};
+
         Product updatedProduct = productFactory.updateImage(product1, "updated-art.jpeg", fakeImageData);
 
         assertNotNull(updatedProduct);
         assertEquals(product1.getProductID(), updatedProduct.getProductID());
         assertEquals("/images/updated-art.jpeg", updatedProduct.getImageUrl());
         assertArrayEquals(fakeImageData, updatedProduct.getImageData());
+
+
+        assertNotSame(product1, updatedProduct);
     }
 }
+
