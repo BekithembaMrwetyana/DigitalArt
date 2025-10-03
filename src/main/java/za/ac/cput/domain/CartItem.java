@@ -37,6 +37,11 @@ public class CartItem {
     @JoinColumn(name = "cartID")
     private Cart cart;
 
+    @ManyToOne
+    @JoinColumn(name = "orderid")  //
+    private Order order;
+
+
     @Column(name = "quantity", nullable = false)
     private int quantity = 1;
 
@@ -50,6 +55,7 @@ public class CartItem {
         this.user = builder.user;
         this.quantity = builder.quantity;
         this.price = builder.price;
+
     }
 
     public Long getCartItemID() {
@@ -86,6 +92,18 @@ public class CartItem {
                 '}';
     }
 
+    public void setOrder(Order order) {
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+
     public static class Builder {
         private Long cartItemID;
         private Cart cart;
@@ -93,6 +111,7 @@ public class CartItem {
         private int quantity;
         private User user;
         private double price;
+        private Order order;
 
         public Builder setCartItemID(Long cartItemID) {
             this.cartItemID = cartItemID;
@@ -122,13 +141,19 @@ public class CartItem {
             return this;
         }
 
+        public void setOrder(Order order) {
+            this.order = order;
+        }
+
+
         public Builder copy(CartItem cartItem) {
             this.cartItemID = cartItem.cartItemID;
             this.cart = cartItem.cart;
             this.product = cartItem.product;
-             this.user = cartItem.user;
+            this.user = cartItem.user;
             this.quantity = cartItem.quantity;
             this.price = cartItem.price;
+            this.order = cartItem.order;
             return this;
 
         }

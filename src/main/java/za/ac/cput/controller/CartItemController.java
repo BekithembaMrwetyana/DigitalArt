@@ -15,7 +15,7 @@ Date: 03 August 2025
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins ={ "http://localhost:5173","http://localhost:3000" })
 @RequestMapping("/cart_item")
 public class  CartItemController {
 

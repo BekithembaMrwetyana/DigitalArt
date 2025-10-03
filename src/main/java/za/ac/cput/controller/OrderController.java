@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import za.ac.cput.domain.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import za.ac.cput.dto.OrderDTO;
 import za.ac.cput.service.OrderService;
 import za.ac.cput.domain.enums.OrderStatus;
 import java.util.List;
@@ -27,10 +28,20 @@ public class OrderController {
     }
 
     // Create
+//    @PostMapping("/create")
+//    public ResponseEntity<Order> create(@RequestBody Order order) {
+//        Order saved = service.create(order);
+//        return ResponseEntity.ok(saved);
+//    }
     @PostMapping("/create")
-    public ResponseEntity<Order> create(@RequestBody Order order) {
-        Order saved = service.create(order);
-        return ResponseEntity.ok(saved);
+    public ResponseEntity<Order> create(@RequestBody OrderDTO orderDTO) {
+        try {
+            Order saved = service.createOrderFromDTO(orderDTO);
+            return ResponseEntity.ok(saved);
+        } catch (Exception e) {
+            e.printStackTrace(); // log the real error
+            return ResponseEntity.status(500).build();
+        }
     }
 
     // Read by id

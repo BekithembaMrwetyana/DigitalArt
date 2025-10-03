@@ -14,6 +14,7 @@ public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private Long orderID;
 
     @Column(updatable = false)
@@ -25,9 +26,11 @@ public class Order {
     @Embedded
     private Address shippingAddress;
 
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId", referencedColumnName = "userId", nullable = true)
+    @JoinColumn(name = "user_id", nullable = true)
     @JsonBackReference
+
     private User user;
 
     @Enumerated(EnumType.STRING)
@@ -35,8 +38,10 @@ public class Order {
 
 
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "orderID", referencedColumnName = "orderID")
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @JsonManagedReference
+
     private List<CartItem> cartItems;
 
     public User getUser() {

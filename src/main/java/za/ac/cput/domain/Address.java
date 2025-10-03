@@ -4,12 +4,13 @@ import jakarta.persistence.*;
 
 @Embeddable
 public class Address {
-
-    private String street;
     private String city;
-    private String province;
-    private String postalCode;
     private String country;
+    private String postalCode;
+    private String province;
+    private String street;
+
+
 
     protected Address() {}
 
