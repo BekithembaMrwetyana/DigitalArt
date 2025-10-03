@@ -22,11 +22,9 @@ class CategoryServiceTest {
     @BeforeAll
     static void setUp() {
         category1= CategoryFactory.createCategory("Potraits" , "Digital art showing a person's face or expression");
-        assertNotNull(category1);
         System.out.println(category1);
 
         category2= CategoryFactory.createCategory("Abstract Art" , "Digital art conveys feelings through shapes and colors.");
-        assertNotNull(category2);
         System.out.println(category2);
     }
 

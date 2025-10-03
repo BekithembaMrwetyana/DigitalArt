@@ -14,30 +14,40 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class CategoryFactoryTest {
 
-    private static final Category category1 = CategoryFactory.createCategory("Potraits" , "Digital art showing a person's face or expression");
-
-    private static final Category category2 = CategoryFactory.createCategory(null , "Digital art using shapes and colors");
-
-    private static final Category category3 = CategoryFactory.createCategory("Wall Art" , "");
-
     @Test
-    void createCategory() {
-        assertNotNull(category1);
-        System.out.println(category1);
+    void createValidCategory() {
+        Category category = CategoryFactory.createCategory(
+                "Portraits",
+                "Digital art showing a person's face or expression"
+        );
+        assertNotNull(category);
+        assertEquals("Portraits", category.getName());
+        assertEquals("Digital art showing a person's face or expression", category.getDescription());
+        System.out.println(category);
     }
 
     @Test
-    void createCategoryWithNullName() {
-        assertNotNull(category2);
-        System.out.println(category2);
+    void createCategoryWithNullName_ShouldFail() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            CategoryFactory.createCategory(null, "Digital art using shapes and colors");
+        });
+        assertEquals("Category name cannot be null or empty", exception.getMessage());
     }
 
     @Test
-    void createCategoryThatWillFail() {
-        //fail();
-        assertNotNull(category3);
-        System.out.println(category3);
+    void createCategoryWithEmptyName_ShouldFail() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            CategoryFactory.createCategory("", "Empty name test");
+        });
+        assertEquals("Category name cannot be null or empty", exception.getMessage());
     }
 
-
+    @Test
+    void createCategoryWithEmptyDescription_ShouldPass() {
+        Category category = CategoryFactory.createCategory("Wall Art", "");
+        assertNotNull(category);
+        assertEquals("Wall Art", category.getName());
+        assertEquals("", category.getDescription());
+        System.out.println(category);
+    }
 }

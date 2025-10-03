@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +29,15 @@ public class ProductService implements IProductService {
 
     @Override
     public Product create(Product product) {
+        Optional<Product> existing = productRepository.findByTitleAndCategory(
+                product.getTitle(),
+                product.getCategory()
+        );
+
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+
         try {
             if (product.getImageUrl() != null && (product.getImageData() == null || product.getImageData().length == 0)) {
                 String fileName = Paths.get(product.getImageUrl()).getFileName().toString();

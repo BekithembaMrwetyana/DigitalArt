@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.MethodName.class)
-
 class CategoryControllerTest {
 
     private static Category category;
@@ -30,11 +29,15 @@ class CategoryControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    private static final String BASE_URL = "/category";
+
+    private static final String BASE_URL = "/api/categories";
 
     @BeforeAll
     public static void setup() {
-        category = CategoryFactory.createCategory("Wall Art" ,  "A beautiful piece that adds elegance to any space");
+        category = CategoryFactory.createCategory(
+                "Wall Art",
+                "A beautiful piece that adds elegance to any space"
+        );
     }
 
     @Test
@@ -45,7 +48,7 @@ class CategoryControllerTest {
         assertNotNull(createdCategory);
         assertEquals(category.getName(), createdCategory.getName());
         category = createdCategory;
-        System.out.println("created: " + createdCategory);
+        System.out.println("Created: " + createdCategory);
     }
 
     @Test
@@ -55,7 +58,7 @@ class CategoryControllerTest {
         ResponseEntity<Category> response = this.restTemplate.getForEntity(url, Category.class);
         assertNotNull(response.getBody());
         assertEquals(category.getCategoryId(), response.getBody().getCategoryId());
-        System.out.println("read: " + response.getBody());
+        System.out.println("Read: " + response.getBody());
     }
 
     @Test
@@ -67,7 +70,12 @@ class CategoryControllerTest {
                 .build();
 
         HttpEntity<Category> request = new HttpEntity<>(updatedCategory);
-        ResponseEntity<Category> response = restTemplate.exchange(BASE_URL + "/update", HttpMethod.PUT,request, Category.class);
+        ResponseEntity<Category> response = restTemplate.exchange(
+                BASE_URL + "/update",
+                HttpMethod.PUT,
+                request,
+                Category.class
+        );
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -78,21 +86,25 @@ class CategoryControllerTest {
         System.out.println("Updated: " + category);
     }
 
-   @Test
-   @Order(5)
-   void d_delete() {
-        restTemplate.delete(BASE_URL + "/delete/" + category.getCategoryId());
-   }
-
     @Test
     @Order(4)
     void d_getAll() {
         String url = BASE_URL + "/getAll";
-        ResponseEntity<Category[]> response = this.restTemplate. getForEntity(url, Category[].class);
+        ResponseEntity<Category[]> response = this.restTemplate.getForEntity(url, Category[].class);
         assertNotNull(response.getBody());
-        System.out.println("Get All; ");
-        for (Category category : response.getBody()) {
-            System.out.println(category);
+        assertTrue(response.getBody().length > 0, "Should return at least one category");
+        System.out.println("Get All:");
+        for (Category c : response.getBody()) {
+            System.out.println(c);
         }
+    }
+
+    @Test
+    @Order(5)
+    void e_delete() {
+        String url = BASE_URL + "/" + category.getCategoryId();
+        ResponseEntity<Void> response = restTemplate.exchange(url, HttpMethod.DELETE, null, Void.class);
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        System.out.println("Deleted category with ID: " + category.getCategoryId());
     }
 }

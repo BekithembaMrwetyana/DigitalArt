@@ -10,7 +10,10 @@ Author: Thimna Gogwana (222213973)
 Date: 25 May 2025
 */
 @Entity
-@Table(name = "products")
+@Table(name = "products",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"title", "category_id"})
+        })
 @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class Product {
 
@@ -20,6 +23,7 @@ public class Product {
     private Long productID;
 
     private String title;
+
     private String description;
     private double price;
 

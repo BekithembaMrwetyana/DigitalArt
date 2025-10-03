@@ -1,63 +1,69 @@
 package za.ac.cput.domain;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import java.util.List;
+
+import java.time.LocalDateTime;
+
 
 @Entity
-@Table(name = "Wishlist")
+@Table(name = "wishlists")
 public class Wishlist {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long wishlistID;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId", referencedColumnName = "userId")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToMany
-    @JoinTable(
-            name = "wishlist_products",
-            joinColumns = @JoinColumn(name = "wishlistID"),
-            inverseJoinColumns = @JoinColumn(name = "productId")
-    )
-    private List<Product> products;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
+
+    @Column(name = "date_added")
+    private LocalDateTime dateAdded;
 
     protected Wishlist() {}
 
-    public Wishlist(Builder builder) {
-        this.wishlistID = builder.wishlistID;
+    private Wishlist(Builder builder) {
+        this.id = builder.id;
         this.user = builder.user;
-        this.products = builder.products;
+        this.product = builder.product;
+        this.dateAdded = builder.dateAdded;
     }
 
-    public Long getWishlistID() {
-        return wishlistID;
-    }
+    // Getters and Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public User getUser() {
-        return user;
-    }
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
 
-    public List<Product> getProducts() {
-        return products;
-    }
+    public Product getProduct() { return product; }
+    public void setProduct(Product product) { this.product = product; }
+
+    public LocalDateTime getDateAdded() { return dateAdded; }
+    public void setDateAdded(LocalDateTime dateAdded) { this.dateAdded = dateAdded; }
 
     @Override
     public String toString() {
         return "Wishlist{" +
-                "wishlistID=" + wishlistID +
-                ", user=" + (user != null ? user.getUserId() : null) +
-                ", products=" + products +
+                "id=" + id +
+                ", userId=" + (user != null ? user.getUserId() : null) +
+                ", productId=" + (product != null ? product.getProductID() : null) +
+                ", dateAdded=" + dateAdded +
                 '}';
     }
 
     public static class Builder {
-        private Long wishlistID;
+        private Long id;
         private User user;
-        private List<Product> products;
+        private Product product;
+        private LocalDateTime dateAdded;
 
-        public Builder setWishlistID(Long wishlistID) {
-            this.wishlistID = wishlistID;
+        public Builder setId(Long id) {
+            this.id = id;
             return this;
         }
 
@@ -66,15 +72,21 @@ public class Wishlist {
             return this;
         }
 
-        public Builder setProducts(List<Product> products) {
-            this.products = products;
+        public Builder setProduct(Product product) {
+            this.product = product;
+            return this;
+        }
+
+        public Builder setDateAdded(LocalDateTime dateAdded) {
+            this.dateAdded = dateAdded;
             return this;
         }
 
         public Builder copy(Wishlist wishlist) {
-            this.wishlistID = wishlist.wishlistID;
+            this.id = wishlist.id;
             this.user = wishlist.user;
-            this.products = wishlist.products;
+            this.product = wishlist.product;
+            this.dateAdded = wishlist.dateAdded;
             return this;
         }
 
