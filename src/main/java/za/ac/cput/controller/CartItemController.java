@@ -1,8 +1,11 @@
 package za.ac.cput.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.CartItem;
+import za.ac.cput.dto.CartItemDTO;
 import za.ac.cput.service.CartItemService;
 /*
 CartItemController.java
@@ -26,10 +29,19 @@ public class  CartItemController {
         this.service = service;
     }
 
-    @PostMapping("/create")
-    public CartItem create(@RequestBody CartItem cartItem) {
-        return service.create(cartItem);
+
+
+    @PostMapping(
+            value = "/create",
+            consumes = "application/json",
+            produces = "application/json"
+    )
+    public ResponseEntity<CartItem> create(@RequestBody CartItemDTO dto) {
+        CartItem saved = service.createFromDTO(dto);
+        return ResponseEntity.ok(saved);
     }
+
+
 
     @DeleteMapping("/delete/{cartItemId}")
     public void delete(@PathVariable Long cartItemId) {
