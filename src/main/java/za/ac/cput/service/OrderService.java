@@ -28,7 +28,7 @@ public class OrderService implements IOrderService {
     @Autowired
     public OrderService(OrderRepository repository,
                         UserRepository userRepository,
-                        ProductRepository productRepository,CartItemRepository cartItemRepository ) {
+                        ProductRepository productRepository, CartItemRepository cartItemRepository) {
         this.repository = repository;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
@@ -79,10 +79,15 @@ public class OrderService implements IOrderService {
         items.forEach(item -> item.setOrder(order));
         order.setCartItems(items);
 
-        // Save and return the order
-        return repository.save(order);
-    }
+        Order savedOrder = repository.save(order);
+        for (CartItem item : items) {
+            item.setOrder(savedOrder);
+            cartItemRepository.save(item);
+        }
 
+        return savedOrder;// Save and return the order
+
+    }
 
 
     @Override
@@ -138,4 +143,18 @@ public class OrderService implements IOrderService {
     public List<Order> getOrdersByUserIdAndStatus(Long userId, OrderStatus status) {
         return repository.findByUserUserIdAndPaymentStatus(userId, status);
     }
+
+    /**
+     * Generate download links for a completed order.
+     */
+    public List<String> generateDownloadLinks(Order order) {
+        return order.getCartItems().stream()
+                .map(item -> "http://localhost:8080/api/orders/download/"
+                        + order.getOrderID() + "/"
+                        + item.getProduct().getProductID())
+                .collect(Collectors.toList());
+    }
 }
+
+
+
