@@ -3,6 +3,7 @@ package za.ac.cput.domain;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -43,6 +44,11 @@ public class Order {
     @JsonManagedReference
 
     private List<CartItem> cartItems;
+
+    @JsonProperty("userID")
+    public Long getUserID() {
+        return user != null ? user.getUserId() : null;
+    }
 
     public User getUser() {
         return user;
