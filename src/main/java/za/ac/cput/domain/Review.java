@@ -20,9 +20,9 @@ public class Review {
     @JoinColumn(name = "userId", nullable = false)
     private User user;
 
-   @ManyToOne
-   @JoinColumn(name ="productID", nullable = false)
-   private Product product;
+    @ManyToOne
+    @JoinColumn(name ="productID", nullable = false)
+    private Product product;
 
     private int rating;
     private String comment;

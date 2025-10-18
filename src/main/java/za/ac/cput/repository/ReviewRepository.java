@@ -6,16 +6,28 @@ import za.ac.cput.domain.Product;
 import za.ac.cput.domain.Review;
 
 import java.util.List;
+
 /*
 ReviewRepository.java
-ReviewRepository POJO class
+ReviewRepository interface
 Author: Thandolwethu P Mseleku
 Date: 16/07/2025
 */
 @Repository
-public interface ReviewRepository extends JpaRepository<Review,Long> {
-   List<Review> findByProduct( Product product);
-   List<Review> findByRating(int rating);
-   List<Review> findByProductAndRating( Product product, int rating);
- List<Review>findReviewByProduct_ProductID( Long product_id);
+public interface ReviewRepository extends JpaRepository<Review, Long> {
+
+
+    List<Review> findByProduct(Product product);
+
+
+    List<Review> findByRating(int rating);
+
+
+    List<Review> findByProductAndRating(Product product, int rating);
+
+
+    List<Review> findReviewByProduct_ProductID(Long productId);
+
+
+    List<Review> findReviewByUser_UserId(Long userId);
 }
