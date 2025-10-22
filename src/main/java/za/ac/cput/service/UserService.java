@@ -1,5 +1,6 @@
 package za.ac.cput.service;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import za.ac.cput.domain.User;
 import za.ac.cput.domain.enums.Role;
@@ -10,9 +11,11 @@ import java.util.List;
 public class UserService implements IUserService {
 
     private final UserRepository repository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository repository) {
+    public UserService(UserRepository repository, PasswordEncoder passwordEncoder) {
         this.repository = repository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -20,18 +23,21 @@ public class UserService implements IUserService {
         if (getByEmail(user.getEmail()) != null) {
             throw new IllegalArgumentException("Email already in use");
         }
-        if (repository.existsByPassword(user.getPassword())) {
-            throw new IllegalArgumentException("Password already in use");
+        if (repository.existsByPhoneNumber(user.getPhoneNumber())) {
+            throw new IllegalArgumentException("Phone number already in use");
         }
         if (!user.getPhoneNumber().matches("\\d{10,11}")) {
             throw new IllegalArgumentException("Phone number must be 10-11 digits");
         }
-        if (repository.existsByPhoneNumber(user.getPhoneNumber())) {
-            throw new IllegalArgumentException("Phone number already in use");
-        }
+
+        // ✅ Default role: CUSTOMER
         if (user.getRole() == null) {
             user.setRole(Role.CUSTOMER);
         }
+
+        // ✅ Hash password before saving
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
         return repository.save(user);
     }
 
@@ -53,7 +59,8 @@ public class UserService implements IUserService {
         if (user.getLastName() != null) existing.setLastName(user.getLastName());
         if (user.getEmail() != null) existing.setEmail(user.getEmail());
         if (user.getPhoneNumber() != null) existing.setPhoneNumber(user.getPhoneNumber());
-        if (user.getPassword() != null) existing.setPassword(user.getPassword());
+        if (user.getPassword() != null)
+            existing.setPassword(passwordEncoder.encode(user.getPassword())); // ✅ re-hash
         if (user.getRole() != null) existing.setRole(user.getRole());
 
         return repository.save(existing);
@@ -75,5 +82,10 @@ public class UserService implements IUserService {
                 .filter(u -> u.getEmail() != null && u.getEmail().equalsIgnoreCase(email))
                 .findFirst()
                 .orElse(null);
+    }
+
+    // ✅ Use BCrypt to verify password
+    public boolean passwordMatches(String rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
     }
 }
