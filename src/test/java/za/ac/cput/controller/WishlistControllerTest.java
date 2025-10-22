@@ -3,91 +3,88 @@ package za.ac.cput.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import za.ac.cput.domain.Product;
-import za.ac.cput.domain.User;
-import za.ac.cput.domain.Wishlist;
-import za.ac.cput.factory.WishlistFactory;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import za.ac.cput.service.WishlistService;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(WishlistController.class)
 class WishlistControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @Mock
     private WishlistService wishlistService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @InjectMocks
+    private WishlistController wishlistController;
 
-    private User user;
-    private Product product;
-    private Wishlist wishlist;
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
-        user = new User.Builder()
-                .setUserId(1L)
-                .setFirstName("John")
-                .setLastName("Doe")
-                .build();
-
-        product = new Product.Builder()
-                .setProductID(1L)
-                .setTitle("Test Product")
-                .build();
-
-        wishlist = WishlistFactory.createWishlist(user, product);
-        wishlist.setId(1L);
+        MockitoAnnotations.openMocks(this);
+        mockMvc = MockMvcBuilders.standaloneSetup(wishlistController).build();
+        objectMapper = new ObjectMapper();
     }
 
     @Test
-    void testGetWishlistByUser() throws Exception {
-
-        List<Wishlist> wishlists = Arrays.asList(wishlist);
-        when(wishlistService.getWishlistByUser(any(User.class))).thenReturn(wishlists);
-
-
-        mockMvc.perform(get("/api/wishlist/user/1"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$[0].id").value(1L));
-    }
-
-    @Test
-    void testAddWishlistItem() throws Exception {
-
-        when(wishlistService.addWishlistItem(any(User.class), any(Product.class))).thenReturn(wishlist);
-
+    void testAddToWishlist() throws Exception {
+        Map<String, Long> request = new HashMap<>();
+        request.put("userId", 1L);
+        request.put("productId", 100L);
 
         mockMvc.perform(post("/api/wishlist/add")
-                        .param("userId", "1")
-                        .param("productId", "1"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(1L));
+                .andExpect(content().string("Added to wishlist"));
+
+        verify(wishlistService, times(1)).addToWishlist(1L, 100L);
     }
 
     @Test
-    void testRemoveWishlistItem() throws Exception {
+    void testAddToWishlistBadRequest() throws Exception {
+        Map<String, Long> request = new HashMap<>();
+        // Missing productId
 
-        mockMvc.perform(delete("/api/wishlist/remove")
-                        .param("userId", "1")
-                        .param("productId", "1"))
-                .andExpect(status().isNoContent());
+        mockMvc.perform(post("/api/wishlist/add")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("userId and productId are required"));
+    }
+
+    @Test
+    void testRemoveFromWishlist() throws Exception {
+        mockMvc.perform(delete("/api/wishlist/remove/100")
+                        .param("userId", "1"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Removed from wishlist"));
+
+        verify(wishlistService, times(1)).removeFromWishlist(1L, 100L);
+    }
+
+    @Test
+    void testGetWishlist() throws Exception {
+        List<Long> productIds = Arrays.asList(100L, 200L);
+        when(wishlistService.getWishlistProductIdsByUserId(1L)).thenReturn(productIds);
+
+        mockMvc.perform(get("/api/wishlist/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().json("[100,200]"));
+
+        verify(wishlistService, times(1)).getWishlistProductIdsByUserId(1L);
     }
 }
