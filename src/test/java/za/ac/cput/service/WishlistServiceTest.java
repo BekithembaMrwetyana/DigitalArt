@@ -5,15 +5,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import za.ac.cput.domain.Product;
-import za.ac.cput.domain.User;
+
 import za.ac.cput.domain.Wishlist;
-import za.ac.cput.factory.WishlistFactory;
+
 import za.ac.cput.repository.WishlistRepository;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -27,95 +26,61 @@ class WishlistServiceTest {
     @InjectMocks
     private WishlistService wishlistService;
 
-    private User user;
-    private Product product;
-    private Wishlist wishlist;
-
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-
-        user = new User.Builder()
-                .setUserId(1L)
-                .setFirstName("John")
-                .setLastName("Doe")
-                .build();
-
-        product = new Product.Builder()
-                .setProductID(1L)
-                .setTitle("Test Product")
-                .build();
-
-        wishlist = WishlistFactory.createWishlist(user, product);
-        wishlist.setId(1L);
     }
 
     @Test
-    void testGetWishlistByUser() {
-        // Given
-        when(wishlistRepository.findByUser(user)).thenReturn(Arrays.asList(wishlist));
+    void testAddToWishlist() {
+        Long userId = 1L;
+        Long productId = 100L;
 
-        // When
-        List<Wishlist> result = wishlistService.getWishlistByUser(user);
+        when(wishlistRepository.existsByUserIdAndProductId(userId, productId)).thenReturn(false);
 
-        // Then
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(wishlist, result.get(0));
-        verify(wishlistRepository, times(1)).findByUser(user);
-    }
+        wishlistService.addToWishlist(userId, productId);
 
-    @Test
-    void testAddWishlistItem_NewItem() {
-
-        when(wishlistRepository.findByUserAndProduct(user, product)).thenReturn(Arrays.asList());
-        when(wishlistRepository.save(any(Wishlist.class))).thenReturn(wishlist);
-
-
-        Wishlist result = wishlistService.addWishlistItem(user, product);
-
-
-        assertNotNull(result);
-        assertEquals(wishlist, result);
-        verify(wishlistRepository, times(1)).findByUserAndProduct(user, product);
+        verify(wishlistRepository, times(1)).existsByUserIdAndProductId(userId, productId);
         verify(wishlistRepository, times(1)).save(any(Wishlist.class));
     }
 
     @Test
-    void testAddWishlistItem_ExistingItem() {
+    void testAddToWishlistAlreadyExists() {
+        Long userId = 1L;
+        Long productId = 100L;
 
-        when(wishlistRepository.findByUserAndProduct(user, product)).thenReturn(Arrays.asList(wishlist));
+        when(wishlistRepository.existsByUserIdAndProductId(userId, productId)).thenReturn(true);
 
+        wishlistService.addToWishlist(userId, productId);
 
-        Wishlist result = wishlistService.addWishlistItem(user, product);
-
-
-        assertNotNull(result);
-        assertEquals(wishlist, result);
-        verify(wishlistRepository, times(1)).findByUserAndProduct(user, product);
+        verify(wishlistRepository, times(1)).existsByUserIdAndProductId(userId, productId);
         verify(wishlistRepository, never()).save(any(Wishlist.class));
     }
 
     @Test
-    void testRemoveWishlistItem() {
+    void testRemoveFromWishlist() {
+        Long userId = 1L;
+        Long productId = 100L;
 
-        wishlistService.removeWishlistItem(user, product);
+        wishlistService.removeFromWishlist(userId, productId);
 
-
-        verify(wishlistRepository, times(1)).deleteByUserAndProduct(user, product);
+        verify(wishlistRepository, times(1)).deleteByUserIdAndProductId(userId, productId);
     }
 
     @Test
-    void testGetWishlistItem() {
+    void testGetWishlistProductIdsByUserId() {
+        Long userId = 1L;
+        Wishlist entity1 = new Wishlist(userId, 100L);
+        Wishlist entity2 = new Wishlist(userId, 200L);
+        List<Wishlist> entities = Arrays.asList(entity1, entity2);
 
-        when(wishlistRepository.findById(1L)).thenReturn(Optional.of(wishlist));
+        when(wishlistRepository.findByUserId(userId)).thenReturn(entities);
 
+        List<Long> productIds = wishlistService.getWishlistProductIdsByUserId(userId);
 
-        Optional<Wishlist> result = wishlistService.getWishlistItem(1L);
-
-
-        assertTrue(result.isPresent());
-        assertEquals(wishlist, result.get());
-        verify(wishlistRepository, times(1)).findById(1L);
+        assertEquals(2, productIds.size());
+        assertTrue(productIds.contains(100L));
+        assertTrue(productIds.contains(200L));
+        verify(wishlistRepository, times(1)).findByUserId(userId);
     }
 }

@@ -3,44 +3,39 @@ package za.ac.cput.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import za.ac.cput.domain.Product;
-import za.ac.cput.domain.User;
-import za.ac.cput.domain.Wishlist;
 import za.ac.cput.service.WishlistService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/wishlist")
+@CrossOrigin(origins = "http://localhost:5173")
 public class WishlistController {
 
-    private final WishlistService wishlistService;
-
     @Autowired
-    public WishlistController(WishlistService wishlistService) {
-        this.wishlistService = wishlistService;
-    }
-
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Wishlist>> getWishlistByUser(@PathVariable Long userId) {
-        User user = new User.Builder().setUserId(userId).build();
-        List<Wishlist> wishlist = wishlistService.getWishlistByUser(user);
-        return ResponseEntity.ok(wishlist);
-    }
+    private WishlistService wishlistService;
 
     @PostMapping("/add")
-    public ResponseEntity<Wishlist> addWishlistItem(@RequestParam Long userId, @RequestParam Long productId) {
-        User user = new User.Builder().setUserId(userId).build();
-        Product product = new Product.Builder().setProductID(productId).build();
-        Wishlist wishlist = wishlistService.addWishlistItem(user, product);
-        return ResponseEntity.ok(wishlist);
+    public ResponseEntity<String> addToWishlist(@RequestBody Map<String, Long> request) {
+        Long userId = request.get("userId");
+        Long productId = request.get("productId");
+        if (userId == null || productId == null) {
+            return ResponseEntity.badRequest().body("userId and productId are required");
+        }
+        wishlistService.addToWishlist(userId, productId);
+        return ResponseEntity.ok("Added to wishlist");
     }
 
-    @DeleteMapping("/remove")
-    public ResponseEntity<Void> removeWishlistItem(@RequestParam Long userId, @RequestParam Long productId) {
-        User user = new User.Builder().setUserId(userId).build();
-        Product product = new Product.Builder().setProductID(productId).build();
-        wishlistService.removeWishlistItem(user, product);
-        return ResponseEntity.noContent().build();
+    @DeleteMapping("/remove/{productId}")
+    public ResponseEntity<String> removeFromWishlist(@PathVariable Long productId, @RequestParam Long userId) {
+        wishlistService.removeFromWishlist(userId, productId);
+        return ResponseEntity.ok("Removed from wishlist");
+    }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<Long>> getWishlist(@PathVariable Long userId) {
+        List<Long> productIds = wishlistService.getWishlistProductIdsByUserId(userId);
+        return ResponseEntity.ok(productIds);
     }
 }

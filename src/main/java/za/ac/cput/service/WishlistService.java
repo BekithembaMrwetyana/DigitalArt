@@ -12,36 +12,29 @@ import za.ac.cput.repository.WishlistRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class WishlistService {
 
-    private final WishlistRepository wishlistRepository;
-
     @Autowired
-    public WishlistService(WishlistRepository wishlistRepository) {
-        this.wishlistRepository = wishlistRepository;
-    }
+    private WishlistRepository wishlistRepository;
 
-    public List<Wishlist> getWishlistByUser(User user) {
-        return wishlistRepository.findByUser(user);
-    }
-
-    public Wishlist addWishlistItem(User user, Product product) {
-
-        List<Wishlist> existing = wishlistRepository.findByUserAndProduct(user, product);
-        if (!existing.isEmpty()) {
-            return existing.get(0);
+    public void addToWishlist(Long userId, Long productId) {
+        if (!wishlistRepository.existsByUserIdAndProductId(userId, productId)) {
+            Wishlist wishlist = WishlistFactory.createWishlist(userId, productId);
+            wishlistRepository.save(wishlist);
         }
-        Wishlist wishlist = WishlistFactory.createWishlist(user, product);
-        return wishlistRepository.save(wishlist);
     }
 
-    public void removeWishlistItem(User user, Product product) {
-        wishlistRepository.deleteByUserAndProduct(user, product);
+    public void removeFromWishlist(Long userId, Long productId) {
+        wishlistRepository.deleteByUserIdAndProductId(userId, productId);
     }
 
-    public Optional<Wishlist> getWishlistItem(Long id) {
-        return wishlistRepository.findById(id);
+    public List<Long> getWishlistProductIdsByUserId(Long userId) {
+        List<Wishlist> wishlistEntities = wishlistRepository.findByUserId(userId);
+        return wishlistEntities.stream()
+                .map(Wishlist::getProductId)
+                .collect(Collectors.toList());
     }
 }

@@ -36,7 +36,7 @@ class ProductServiceTest {
 
 
     static Product neonDreams, pixelSunrise, portraitAlice, portraitBob, abstractWaves, fantasyForest,
-            sculpture3D, abstractArt, auroraFields, dreamMachine, cityScape,purpleMirage, galsticVoyage, monaDiva;
+            sculpture3D, abstractArt, auroraFields, dreamMachine, cityScape,purpleMirage, galsticVoyage, monaDiva, ataMene, intoTheWild, piecesOfMe,dissonance,fadingMemories,beneathTheClouds;
 
     private Product createIfNotExists(String title, Category category, double price, String imageUrl, String description) {
         return productService.getAll().stream()
@@ -218,6 +218,55 @@ class ProductServiceTest {
                 .setImageUrl("/images/art21.jpeg")
                 .setCategory(portraits)
                 .build());
+
+        ataMene= productService.create(new Product.Builder()
+                .setTitle("Ata Mene")
+                .setDescription("Outside experiences")
+                .setPrice(179.99)
+                .setImageUrl("/images/art37.jpg")
+                .setCategory(portraits)
+                .build());
+
+        intoTheWild = productService.create(new Product.Builder()
+                .setTitle("Into the Wild")
+                .setDescription("Forest Vibes ")
+                .setPrice(72.99)
+                .setImageUrl("/images/art47.jpg")
+                .setCategory(landscape)
+                .build());
+
+        piecesOfMe= productService.create(new Product.Builder()
+                .setTitle("Pieces of me")
+                .setDescription("Outside experiences")
+                .setPrice(87.99)
+                .setImageUrl("/images/art48.jpg")
+                .setCategory(surreal)
+                .build());
+
+        dissonance= productService.create(new Product.Builder()
+                .setTitle("Dissonance")
+                .setDescription("Outside experiences")
+                .setPrice(129.99)
+                .setImageUrl("/images/art53.jpg")
+                .setCategory(surreal)
+                .build());
+
+        fadingMemories= productService.create(new Product.Builder()
+                .setTitle("Fading Memories")
+                .setDescription("Mind slip away")
+                .setPrice(69.99)
+                .setImageUrl("/images/art26.jpg")
+                .setCategory(popArt)
+                .build());
+
+        beneathTheClouds= productService.create(new Product.Builder()
+                .setTitle("Beneath the Clouds")
+                .setDescription("Underneath the clouds ")
+                .setPrice(179.99)
+                .setImageUrl("/images/art45.jpg")
+                .setCategory(landscape)
+                .build());
+
     }
 
     @Test
