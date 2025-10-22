@@ -1,53 +1,16 @@
-package za.ac.cput.service;
+package za.ac.cput.repository;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.data.jpa.repository.JpaRepository;
 import za.ac.cput.domain.Notification;
 import za.ac.cput.domain.User;
-import za.ac.cput.repository.NotificationRepository;
 
 import java.util.List;
 
-@Service
-public class NotificationService implements INotificationService{
+public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
-    private NotificationRepository notificationRepository;
+    List<Notification> findByUser(User user);
 
-    @Autowired
-    private NotificationService(NotificationRepository repository) {
-        this.notificationRepository = repository;
-    }
+    List<Notification> findByUser_UserId(Long userId);
 
-
-    @Override
-    public Notification create(Notification notification) {
-        return notificationRepository.save(notification);
-    }
-
-    @Override
-    public Notification read(Long notificationId) {
-        return this.notificationRepository.findById(notificationId).orElse(null);
-    }
-
-    @Override
-    public Notification update(Notification notification) {
-        return notificationRepository.save(notification);
-    }
-
-    @Override
-    public void delete(Long notificationId) {
-        this.notificationRepository.deleteById(notificationId);
-
-    }
-    @Override
-    public List<Notification> getAll() {
-        return this.notificationRepository.findAll();
-    }
-
-    @Override
-    public List<Notification> getAllByUser(Long userId) {
-        return notificationRepository.findByUser_UserId(userId);
-    }
-
-
+    List<Notification> findByStatus(Boolean status);
 }

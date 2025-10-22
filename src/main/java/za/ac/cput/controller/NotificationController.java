@@ -1,53 +1,65 @@
-package za.ac.cput.service;
+package za.ac.cput.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.Notification;
-import za.ac.cput.domain.User;
-import za.ac.cput.repository.NotificationRepository;
+import za.ac.cput.service.NotificationService;
 
 import java.util.List;
 
-@Service
-public class NotificationService implements INotificationService{
+@RestController
+@RequestMapping("/notifications")
+@CrossOrigin(origins = "http://localhost:5173")
+public class NotificationController {
 
-    private NotificationRepository notificationRepository;
+    private NotificationService service;
 
     @Autowired
-    private NotificationService(NotificationRepository repository) {
-        this.notificationRepository = repository;
+    public NotificationController(NotificationService service) {
+        this.service = service;
     }
 
-
-    @Override
-    public Notification create(Notification notification) {
-        return notificationRepository.save(notification);
+    @PostMapping("/create")
+    public Notification create(@RequestBody Notification notification) {
+        return service.create(notification);
     }
 
-    @Override
-    public Notification read(Long notificationId) {
-        return this.notificationRepository.findById(notificationId).orElse(null);
+    @GetMapping("/read/{notificationId}")
+    public Notification read(@PathVariable Long notificationId) {
+        return service.read(notificationId);
     }
 
-    @Override
-    public Notification update(Notification notification) {
-        return notificationRepository.save(notification);
+    @PutMapping("/update")
+    public Notification update(@RequestBody Notification notification) {
+        return service.update(notification);
     }
 
-    @Override
-    public void delete(Long notificationId) {
-        this.notificationRepository.deleteById(notificationId);
-
+    @DeleteMapping("/delete/{notificationId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long notificationId) {
+        service.delete(notificationId);
     }
-    @Override
+
+    @GetMapping("/getAll")
     public List<Notification> getAll() {
-        return this.notificationRepository.findAll();
+        return service.getAll();
     }
 
-    @Override
-    public List<Notification> getAllByUser(Long userId) {
-        return notificationRepository.findByUser_UserId(userId);
+    @GetMapping("/getAll/{userId}")
+    public List<Notification> getAllByUser(@PathVariable Long userId) {
+        return service.getAllByUser(userId);
     }
+    @PutMapping("/{notificationId}/mark-as-read")
+    public Notification markAsRead(@PathVariable Long notificationId) {
+        Notification notification = service.read(notificationId);
 
+        // Use the Builder pattern to create an updated notification
+        Notification updatedNotification = new Notification.Builder()
+                .copy(notification)
+                .setStatus(true)
+                .build();
 
+        return service.update(updatedNotification);
+    }
 }
