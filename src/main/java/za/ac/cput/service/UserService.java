@@ -2,9 +2,12 @@ package za.ac.cput.service;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import za.ac.cput.domain.Notification;
 import za.ac.cput.domain.User;
 import za.ac.cput.domain.enums.Role;
 import za.ac.cput.repository.UserRepository;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -12,10 +15,12 @@ public class UserService implements IUserService {
 
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
+    private final NotificationService notificationService;
 
-    public UserService(UserRepository repository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository repository, PasswordEncoder passwordEncoder, NotificationService notificationService  ) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -37,6 +42,19 @@ public class UserService implements IUserService {
 
         // ✅ Hash password before saving
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        User savedUser = repository.save(user);
+
+        Notification welcome = new Notification.Builder()
+                .setTitle("Welcome ")
+                .setMessage("\uD83D\uDC4B Welcome to Our ArtSpace " + savedUser.getFirstName() + "!")
+                .setcreatedAt(LocalDateTime.now())
+                .setStatus(false)
+                .setUser(savedUser)
+                .build();
+
+        notificationService.create(welcome);
+
 
         return repository.save(user);
     }
